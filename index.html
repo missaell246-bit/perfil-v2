@@ -32,159 +32,157 @@
 
     <!-- Sección del Perfil Social -->
     <div class="card" id="profileSection">
-    <h2>Mi Perfil</h2>
-    
-    <!-- Foto de perfil predeterminada -->
-    <div style="text-align: center;">
-        <img id="avatarDisplay" src="https://via.placeholder.com/100" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+        <h2>Mi Perfil</h2>
+        
+        <!-- Foto de perfil predeterminada CORREGIDA -->
+        <div style="text-align: center;">
+            <img id="avatarDisplay" src="https://ui-avatars.com/api/?name=Perfil&background=random" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+        </div>
+
+        <p style="text-align: center; color: gray; font-size: 12px;">Cuenta: <span id="userEmail"></span></p>
+
+        <!-- Campos de la base de datos -->
+        <input type="text" id="profileName" placeholder="Tu nombre completo">
+        <input type="text" id="profileAvatar" placeholder="URL de tu foto (ej. https://...)">
+        <textarea id="profileBio" placeholder="Escribe tu biografía..." style="width: 90%; height: 60px; margin: 10px 0; padding: 10px; font-family: inherit; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+        
+        <button onclick="saveProfile()" style="background-color: #28a745;">Guardar Perfil</button>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+        
+        <!-- Zona de publicaciones -->
+        <textarea placeholder="¿Qué estás pensando?" style="width: 90%; height: 40px; margin-bottom: 10px;"></textarea>
+        <button style="background-color: #1877f2;">Publicar (Próximamente)</button>
+        <button onclick="logout()" style="background-color: #dc3545; margin-top: 15px;">Cerrar Sesión</button>
     </div>
 
-    <p style="text-align: center; color: gray; font-size: 12px;">Cuenta: <span id="userEmail"></span></p>
-
-    <!-- Campos de la base de datos -->
-    <input type="text" id="profileName" placeholder="Tu nombre completo">
-    <input type="text" id="profileAvatar" placeholder="URL de tu foto (ej. https://...)">
-    <textarea id="profileBio" placeholder="Escribe tu biografía..." style="width: 90%; height: 60px; margin: 10px 0; padding: 10px; font-family: inherit; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-    
-    <button onclick="saveProfile()" style="background-color: #28a745;">Guardar Perfil</button>
-    
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
-    
-    <!-- Zona de publicaciones -->
-    <textarea placeholder="¿Qué estás pensando?" style="width: 90%; height: 40px; margin-bottom: 10px;"></textarea>
-    <button style="background-color: #1877f2;">Publicar (Próximamente)</button>
-    <button onclick="logout()" style="background-color: #dc3545; margin-top: 15px;">Cerrar Sesión</button>
-</div>
-
     <script>
-        // 1. Configurar Supabase (REEMPLAZA ESTO CON TUS DATOS)
+        // 1. Configurar Supabase
         const SUPABASE_URL = 'https://urpkgcvlgdesdwkyhdqo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVycGtnY3ZsZ2Rlc2R3a3loZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MTA0NDEsImV4cCI6MjEwNDk4NjQ0MX0.pP3lryKAT973Bo_ke6wkQ2f3TSCsggXfsfnDniAYQ4A';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-      // CORRECCIÓN: Usamos 'supabaseClient' en lugar de 'supabase' para no chocar con la librería
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// URL de tu Google Apps Script (REEMPLAZA ESTO CON TU URL)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLHhVbltHL1Y5smLTEX5XGn_qQHsCnoQonu8WkCrgoTYa305yHb1XTPhT3XvyPRkPM/exec';
-
-let currentUserId = null; 
-
-// 2. Función de Registro Directo
-async function register() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    const { data, error } = await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        document.getElementById('msg').innerText = error.message;
-    } else {
-        document.getElementById('msg').style.color = "green";
-        document.getElementById('msg').innerText = "¡Registro exitoso! Entrando...";
         
-        fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, action: 'Nuevo Registro' })
-        });
+        // CORRECCIÓN: Se eliminó la línea "const supabase = ..." duplicada
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        showProfile(data.user); 
-    }
-}
+        // URL de tu Google Apps Script
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLHhVbltHL1Y5smLTEX5XGn_qQHsCnoQonu8WkCrgoTYa305yHb1XTPhT3XvyPRkPM/exec';
 
-// 3. Función de Login
-async function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
+        let currentUserId = null; 
 
-    if (error) {
-        document.getElementById('msg').innerText = error.message;
-    } else {
-        showProfile(data.user); 
-    }
-}
+        // 2. Función de Registro Directo
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+            });
 
-// 4. Cerrar Sesión
-async function logout() {
-    await supabaseClient.auth.signOut();
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('profileSection').style.display = 'none';
-    document.getElementById('email').value = '';
-    document.getElementById('password').value = '';
-}
+            if (error) {
+                document.getElementById('msg').innerText = error.message;
+            } else {
+                document.getElementById('msg').style.color = "green";
+                document.getElementById('msg').innerText = "¡Registro exitoso! Entrando...";
+                
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, action: 'Nuevo Registro' })
+                });
 
-// 5. Mostrar la vista del perfil
-function showProfile(user) {
-    currentUserId = user.id; 
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('profileSection').style.display = 'block';
-    document.getElementById('userEmail').innerText = user.email;
-    
-    loadProfile();
-}
-
-// 6. Leer datos de la tabla profiles
-async function loadProfile() {
-    const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('name, bio, avatar_url')
-        .eq('id', currentUserId)
-        .single(); 
-
-    if (data) {
-        document.getElementById('profileName').value = data.name || '';
-        document.getElementById('profileBio').value = data.bio || '';
-        document.getElementById('profileAvatar').value = data.avatar_url || '';
-        
-        if (data.avatar_url) {
-            document.getElementById('avatarDisplay').src = data.avatar_url;
+                showProfile(data.user); 
+            }
         }
-    }
-}
 
-// 7. Guardar datos en la tabla profiles
-async function saveProfile() {
-    const name = document.getElementById('profileName').value;
-    const bio = document.getElementById('profileBio').value;
-    const avatar_url = document.getElementById('profileAvatar').value;
+        // 3. Función de Login
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
 
-    const { error } = await supabaseClient
-        .from('profiles')
-        .upsert({
-            id: currentUserId, 
-            name: name,
-            bio: bio,
-            avatar_url: avatar_url
-        });
-
-    if (error) {
-        alert('Error al guardar: ' + error.message);
-    } else {
-        alert('¡Perfil guardado correctamente!');
-        if (avatar_url) {
-            document.getElementById('avatarDisplay').src = avatar_url;
+            if (error) {
+                document.getElementById('msg').innerText = error.message;
+            } else {
+                showProfile(data.user); 
+            }
         }
-    }
-}
 
-// 8. Comprobar sesión activa
-window.onload = async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data.session) {
-        showProfile(data.session.user);
-    }
-};
+        // 4. Cerrar Sesión
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
 
+        // 5. Mostrar la vista del perfil
+        function showProfile(user) {
+            currentUserId = user.id; 
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'block';
+            document.getElementById('userEmail').innerText = user.email;
+            
+            loadProfile();
+        }
+
+        // 6. Leer datos de la tabla profiles
+        async function loadProfile() {
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('name, bio, avatar_url')
+                .eq('id', currentUserId)
+                .single(); 
+
+            if (data) {
+                document.getElementById('profileName').value = data.name || '';
+                document.getElementById('profileBio').value = data.bio || '';
+                document.getElementById('profileAvatar').value = data.avatar_url || '';
+                
+                if (data.avatar_url) {
+                    document.getElementById('avatarDisplay').src = data.avatar_url;
+                }
+            }
+        }
+
+        // 7. Guardar datos en la tabla profiles
+        async function saveProfile() {
+            const name = document.getElementById('profileName').value;
+            const bio = document.getElementById('profileBio').value;
+            const avatar_url = document.getElementById('profileAvatar').value;
+
+            const { error } = await supabaseClient
+                .from('profiles')
+                .upsert({
+                    id: currentUserId, 
+                    name: name,
+                    bio: bio,
+                    avatar_url: avatar_url
+                });
+
+            if (error) {
+                alert('Error al guardar: ' + error.message);
+            } else {
+                alert('¡Perfil guardado correctamente!');
+                if (avatar_url) {
+                    document.getElementById('avatarDisplay').src = avatar_url;
+                }
+            }
+        }
+
+        // 8. Comprobar sesión activa
+        window.onload = async () => {
+            const { data } = await supabaseClient.auth.getSession();
+            if (data.session) {
+                showProfile(data.session.user);
+            }
+        };
     </script>
 </body>
 </html>
