@@ -1,0 +1,1336 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Amigos | RedSocial</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+    }
+
+    .topbar-inner {
+      max-width: 1100px;
+      margin: auto;
+      min-height: 64px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      text-decoration: none;
+      color: #2563eb;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .brand span {
+      color: #0f172a;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      color: #475569;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-btn:hover {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .logout-btn {
+      color: #dc2626;
+    }
+
+    .logout-btn:hover {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 28px));
+      margin: 25px auto 50px;
+    }
+
+    .page-header {
+      margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      margin-bottom: 7px;
+    }
+
+    .page-header p {
+      color: #64748b;
+    }
+
+    .search-card,
+    .section-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, .05);
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .search-box input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+    }
+
+    .search-btn {
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 10px;
+      padding: 0 20px;
+      font-weight: 700;
+    }
+
+    .search-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 17px;
+    }
+
+    .section-title h2 {
+      font-size: 19px;
+    }
+
+    .counter {
+      background: #eff6ff;
+      color: #2563eb;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 15px;
+    }
+
+    .user-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 17px;
+      background: #f8fafc;
+    }
+
+    .user-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
+      color: white;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-username {
+      color: #64748b;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-bio {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 39px;
+      margin-bottom: 15px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      flex: 1;
+      border: none;
+      border-radius: 9px;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary-btn {
+      background: white;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    .secondary-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .danger-btn {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .danger-btn:hover {
+      background: #fee2e2;
+    }
+
+    .accept-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    .accept-btn:hover {
+      background: #15803d;
+    }
+
+    .empty {
+      text-align: center;
+      color: #64748b;
+      padding: 35px 15px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #64748b;
+      padding: 35px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 25px;
+      transform: translate(-50%, 20px);
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 11px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s;
+      z-index: 9999;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .toast.success {
+      background: #16a34a;
+    }
+
+    .toast.error {
+      background: #dc2626;
+    }
+
+    @media (max-width: 650px) {
+
+      .topbar-inner {
+        padding: 10px 12px;
+      }
+
+      .brand {
+        font-size: 17px;
+      }
+
+      .nav-actions {
+        gap: 2px;
+      }
+
+      .nav-btn {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .nav-btn span {
+        display: none;
+      }
+
+      .container {
+        width: min(100% - 18px, 1100px);
+        margin-top: 15px;
+      }
+
+      .page-header h1 {
+        font-size: 23px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-btn {
+        height: 44px;
+      }
+
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-card,
+      .search-card {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+
+    <a href="feed.html" class="brand">
+      Red<span>Social</span>
+    </a>
+
+    <nav class="nav-actions">
+      <a href="feed.html" class="nav-btn">
+        🏠 <span>Inicio</span>
+      </a>
+
+      <a href="profile.html" class="nav-btn">
+        👤 <span>Perfil</span>
+      </a>
+
+      <a href="chat.html" class="nav-btn">
+        💬 <span>Mensajes</span>
+      </a>
+
+      <button id="btn-logout" class="nav-btn logout-btn">
+        🚪 <span>Salir</span>
+      </button>
+    </nav>
+
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>👥 Amigos</h1>
+    <p>Encuentra personas y administra tus amistades.</p>
+  </div>
+
+  <section class="search-card">
+
+    <div class="search-box">
+
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Buscar por nombre o nombre de usuario..."
+      >
+
+      <button id="btn-search" class="search-btn">
+        Buscar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section class="section-card">
+
+    <div class="section-title">
+      <h2>Solicitudes recibidas</h2>
+      <div id="requests-count" class="counter">0</div>
+    </div>
+
+    <div id="requests-list" class="users-grid">
+      <div class="loading">Cargando solicitudes...</div>
+    </div>
+
+  </section>
+
+
+  <section class="section-card">
+
+    <div class="section-title">
+      <h2>Mis amigos</h2>
+      <div id="friends-count" class="counter">0</div>
+    </div>
+
+    <div id="friends-list" class="users-grid">
+      <div class="loading">Cargando amigos...</div>
+    </div>
+
+  </section>
+
+
+  <section class="section-card">
+
+    <div class="section-title">
+      <h2 id="users-title">Descubrir personas</h2>
+      <div id="users-count" class="counter">0</div>
+    </div>
+
+    <div id="users-list" class="users-grid">
+      <div class="loading">Cargando usuarios...</div>
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+  /* ==========================================
+     CONFIGURACIÓN NUEVO SUPABASE
+  ========================================== */
+
+  const SUPABASE_URL = "NUEVA_SUPABASE_URL";
+
+  const SUPABASE_ANON_KEY = "NUEVA_SUPABASE_ANON_KEY";
+
+  const sb = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+  let currentUser = null;
+
+  let currentProfile = null;
+
+  let allProfiles = [];
+
+  let allFriendships = [];
+
+
+  const toastEl = document.getElementById("toast");
+
+  let toastTimer;
+
+
+  function mostrarToast(mensaje, tipo = "success") {
+
+    toastEl.textContent = mensaje;
+
+    toastEl.className = "toast " + tipo + " show";
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove("show");
+    }, 3000);
+
+  }
+
+
+  function escapeHTML(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text || "";
+
+    return div.innerHTML;
+
+  }
+
+
+  function avatarHTML(profile) {
+
+    if (profile.avatar_url) {
+
+      return `
+        <div class="avatar">
+          <img
+            src="${escapeHTML(profile.avatar_url)}"
+            alt="Avatar"
+          >
+        </div>
+      `;
+
+    }
+
+
+    const nombre =
+      profile.full_name ||
+      profile.username ||
+      "U";
+
+
+    return `
+      <div class="avatar">
+        ${escapeHTML(nombre.charAt(0).toUpperCase())}
+      </div>
+    `;
+
+  }
+
+
+  async function iniciar() {
+
+    const {
+      data: {
+        session
+      }
+    } = await sb.auth.getSession();
+
+
+    if (!session) {
+
+      window.location.href = "index.html";
+
+      return;
+
+    }
+
+
+    currentUser = session.user;
+
+    await cargarTodo();
+
+  }
+
+
+  async function cargarTodo() {
+
+    try {
+
+      await Promise.all([
+        cargarMiPerfil(),
+        cargarAmistades(),
+        cargarUsuarios()
+      ]);
+
+
+      renderSolicitudes();
+
+      renderAmigos();
+
+      renderUsuarios(allProfiles);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudieron cargar los datos",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  async function cargarMiPerfil() {
+
+    const {
+      data,
+      error
+    } = await sb
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    currentProfile = data;
+
+  }
+
+
+  async function cargarAmistades() {
+
+    const {
+      data,
+      error
+    } = await sb
+      .from("friendships")
+      .select("*")
+      .or(
+        `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
+      );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    allFriendships = data || [];
+
+  }
+
+
+  async function cargarUsuarios() {
+
+    const {
+      data,
+      error
+    } = await sb
+      .from("profiles")
+      .select("*")
+      .neq("id", currentUser.id)
+      .order("created_at", {
+        ascending: false
+      });
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    allProfiles = data || [];
+
+  }
+
+
+  function obtenerRelacion(userId) {
+
+    return allFriendships.find(friendship =>
+
+      friendship.sender_id === userId ||
+      friendship.receiver_id === userId
+
+    );
+
+  }
+
+
+  function obtenerOtroUsuario(friendship) {
+
+    if (friendship.sender_id === currentUser.id) {
+      return friendship.receiver_id;
+    }
+
+    return friendship.sender_id;
+
+  }
+
+
+  function getProfile(userId) {
+
+    return allProfiles.find(
+      profile => profile.id === userId
+    );
+
+  }
+
+
+  function userCard(profile, buttonsHTML) {
+
+    const nombre =
+      escapeHTML(
+        profile.full_name || "Usuario"
+      );
+
+    const username =
+      escapeHTML(
+        profile.username || "usuario"
+      );
+
+    const bio =
+      escapeHTML(
+        profile.bio || "Sin biografía."
+      );
+
+
+    return `
+      <article class="user-card">
+
+        <div class="user-top">
+
+          ${avatarHTML(profile)}
+
+          <div class="user-info">
+
+            <div class="user-name">
+              ${nombre}
+            </div>
+
+            <div class="user-username">
+              @${username}
+            </div>
+
+          </div>
+
+        </div>
+
+        <p class="user-bio">
+          ${bio}
+        </p>
+
+        <div class="card-actions">
+
+          ${buttonsHTML}
+
+        </div>
+
+      </article>
+    `;
+
+  }
+
+
+  function renderSolicitudes() {
+
+    const container =
+      document.getElementById("requests-list");
+
+
+    const solicitudes =
+      allFriendships.filter(friendship =>
+
+        friendship.receiver_id === currentUser.id &&
+        friendship.status === "pending"
+
+      );
+
+
+    document.getElementById(
+      "requests-count"
+    ).textContent = solicitudes.length;
+
+
+    if (!solicitudes.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          No tienes solicitudes pendientes.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      solicitudes.map(friendship => {
+
+        const profile =
+          getProfile(friendship.sender_id);
+
+
+        if (!profile) {
+          return "";
+        }
+
+
+        return userCard(
+          profile,
+          `
+            <button
+              class="action-btn accept-btn"
+              onclick="aceptarSolicitud('${friendship.id}')"
+            >
+              ✓ Aceptar
+            </button>
+
+            <button
+              class="action-btn danger-btn"
+              onclick="rechazarSolicitud('${friendship.id}')"
+            >
+              ✕
+            </button>
+          `
+        );
+
+      }).join("");
+
+  }
+
+
+  function renderAmigos() {
+
+    const container =
+      document.getElementById("friends-list");
+
+
+    const amistades =
+      allFriendships.filter(
+        friendship =>
+          friendship.status === "accepted"
+      );
+
+
+    document.getElementById(
+      "friends-count"
+    ).textContent = amistades.length;
+
+
+    if (!amistades.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          Aún no tienes amigos.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      amistades.map(friendship => {
+
+        const otherId =
+          obtenerOtroUsuario(friendship);
+
+
+        const profile =
+          getProfile(otherId);
+
+
+        if (!profile) {
+          return "";
+        }
+
+
+        return userCard(
+          profile,
+          `
+            <button
+              class="action-btn secondary-btn"
+              onclick="irChat('${profile.id}')"
+            >
+              💬 Mensaje
+            </button>
+
+            <button
+              class="action-btn danger-btn"
+              onclick="eliminarAmigo('${friendship.id}')"
+            >
+              ✕
+            </button>
+          `
+        );
+
+      }).join("");
+
+  }
+
+
+  function renderUsuarios(users) {
+
+    const container =
+      document.getElementById("users-list");
+
+
+    document.getElementById(
+      "users-count"
+    ).textContent = users.length;
+
+
+    if (!users.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          No se encontraron usuarios.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      users.map(profile => {
+
+        const relation =
+          obtenerRelacion(profile.id);
+
+
+        let buttons = "";
+
+
+        if (!relation) {
+
+          buttons = `
+            <button
+              class="action-btn primary-btn"
+              onclick="enviarSolicitud('${profile.id}')"
+            >
+              ＋ Agregar
+            </button>
+          `;
+
+        } else if (
+          relation.status === "accepted"
+        ) {
+
+          buttons = `
+            <button
+              class="action-btn secondary-btn"
+              onclick="irChat('${profile.id}')"
+            >
+              💬 Mensaje
+            </button>
+          `;
+
+        } else if (
+          relation.sender_id === currentUser.id
+        ) {
+
+          buttons = `
+            <button
+              class="action-btn secondary-btn"
+              disabled
+            >
+              Solicitud enviada
+            </button>
+          `;
+
+        } else {
+
+          buttons = `
+            <button
+              class="action-btn accept-btn"
+              onclick="aceptarSolicitud('${relation.id}')"
+            >
+              ✓ Aceptar
+            </button>
+          `;
+
+        }
+
+
+        return userCard(profile, buttons);
+
+      }).join("");
+
+  }
+
+
+  async function enviarSolicitud(receiverId) {
+
+    try {
+
+      const {
+        error
+      } = await sb
+        .from("friendships")
+        .insert({
+          sender_id: currentUser.id,
+          receiver_id: receiverId,
+          status: "pending"
+        });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      mostrarToast(
+        "Solicitud enviada correctamente"
+      );
+
+
+      await cargarAmistades();
+
+      renderSolicitudes();
+
+      renderAmigos();
+
+      renderUsuarios(allProfiles);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        error.message || "No se pudo enviar la solicitud",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  async function aceptarSolicitud(friendshipId) {
+
+    try {
+
+      const {
+        error
+      } = await sb
+        .from("friendships")
+        .update({
+          status: "accepted"
+        })
+        .eq("id", friendshipId);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      mostrarToast(
+        "Ahora son amigos 🎉"
+      );
+
+
+      await cargarAmistades();
+
+      renderSolicitudes();
+
+      renderAmigos();
+
+      renderUsuarios(allProfiles);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudo aceptar la solicitud",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  async function rechazarSolicitud(friendshipId) {
+
+    try {
+
+      const {
+        error
+      } = await sb
+        .from("friendships")
+        .delete()
+        .eq("id", friendshipId);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      mostrarToast(
+        "Solicitud eliminada"
+      );
+
+
+      await cargarAmistades();
+
+      renderSolicitudes();
+
+      renderAmigos();
+
+      renderUsuarios(allProfiles);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudo eliminar la solicitud",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  async function eliminarAmigo(friendshipId) {
+
+    const confirmar =
+      confirm(
+        "¿Seguro que deseas eliminar a este amigo?"
+      );
+
+
+    if (!confirmar) {
+      return;
+    }
+
+
+    try {
+
+      const {
+        error
+      } = await sb
+        .from("friendships")
+        .delete()
+        .eq("id", friendshipId);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      mostrarToast(
+        "Amigo eliminado"
+      );
+
+
+      await cargarAmistades();
+
+      renderSolicitudes();
+
+      renderAmigos();
+
+      renderUsuarios(allProfiles);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudo eliminar al amigo",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  function irChat(userId) {
+
+    window.location.href =
+      `chat.html?user=${userId}`;
+
+  }
+
+
+  document
+    .getElementById("btn-search")
+    .addEventListener("click", buscarUsuarios);
+
+
+  document
+    .getElementById("search-input")
+    .addEventListener("keydown", event => {
+
+      if (event.key === "Enter") {
+        buscarUsuarios();
+      }
+
+    });
+
+
+  function buscarUsuarios() {
+
+    const texto =
+      document
+        .getElementById("search-input")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    document.getElementById(
+      "users-title"
+    ).textContent =
+      texto
+        ? `Resultados para "${texto}"`
+        : "Descubrir personas";
+
+
+    if (!texto) {
+
+      renderUsuarios(allProfiles);
+
+      return;
+
+    }
+
+
+    const resultados =
+      allProfiles.filter(profile => {
+
+        const nombre =
+          (profile.full_name || "")
+            .toLowerCase();
+
+        const username =
+          (profile.username || "")
+            .toLowerCase();
+
+
+        return (
+          nombre.includes(texto) ||
+          username.includes(texto)
+        );
+
+      });
+
+
+    renderUsuarios(resultados);
+
+  }
+
+
+  document
+    .getElementById("btn-logout")
+    .addEventListener("click", async () => {
+
+      await sb.auth.signOut();
+
+      window.location.href = "index.html";
+
+    });
+
+
+  sb.auth.onAuthStateChange(
+    (event, session) => {
+
+      if (
+        event === "SIGNED_OUT" ||
+        !session
+      ) {
+
+        window.location.href =
+          "index.html";
+
+      }
+
+    }
+  );
+
+
+  iniciar();
+
+</script>
+
+</body>
+</html>
+```
