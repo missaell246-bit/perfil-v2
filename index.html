@@ -62,14 +62,20 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVycGtnY3ZsZ2Rlc2R3a3loZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MTA0NDEsImV4cCI6MjEwNDk4NjQ0MX0.pP3lryKAT973Bo_ke6wkQ2f3TSCsggXfsfnDniAYQ4A';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-       let currentUserId = null; // Variable para guardar el ID del usuario actual
+      // CORRECCIÓN: Usamos 'supabaseClient' en lugar de 'supabase' para no chocar con la librería
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// URL de tu Google Apps Script (REEMPLAZA ESTO CON TU URL)
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLHhVbltHL1Y5smLTEX5XGn_qQHsCnoQonu8WkCrgoTYa305yHb1XTPhT3XvyPRkPM/exec';
+
+let currentUserId = null; 
 
 // 2. Función de Registro Directo
 async function register() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
     });
@@ -80,7 +86,6 @@ async function register() {
         document.getElementById('msg').style.color = "green";
         document.getElementById('msg').innerText = "¡Registro exitoso! Entrando...";
         
-        // Enviar log a Google Apps Script
         fetch(APPS_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -88,7 +93,6 @@ async function register() {
             body: JSON.stringify({ email: email, action: 'Nuevo Registro' })
         });
 
-        // Pasamos el usuario completo
         showProfile(data.user); 
     }
 }
@@ -98,7 +102,7 @@ async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password,
     });
@@ -106,38 +110,36 @@ async function login() {
     if (error) {
         document.getElementById('msg').innerText = error.message;
     } else {
-        // Pasamos el usuario completo
         showProfile(data.user); 
     }
 }
 
 // 4. Cerrar Sesión
 async function logout() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     document.getElementById('authSection').style.display = 'block';
     document.getElementById('profileSection').style.display = 'none';
     document.getElementById('email').value = '';
     document.getElementById('password').value = '';
 }
 
-// 5. Mostrar la vista del perfil (Actualizado)
+// 5. Mostrar la vista del perfil
 function showProfile(user) {
-    currentUserId = user.id; // Guardamos el ID secreto del usuario
+    currentUserId = user.id; 
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('profileSection').style.display = 'block';
     document.getElementById('userEmail').innerText = user.email;
     
-    // Al entrar, cargamos los datos desde Supabase
     loadProfile();
 }
 
-// 6. Leer datos de la tabla profiles (NUEVO)
+// 6. Leer datos de la tabla profiles
 async function loadProfile() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('profiles')
         .select('name, bio, avatar_url')
         .eq('id', currentUserId)
-        .single(); // Solo traemos 1 perfil
+        .single(); 
 
     if (data) {
         document.getElementById('profileName').value = data.name || '';
@@ -150,17 +152,16 @@ async function loadProfile() {
     }
 }
 
-// 7. Guardar datos en la tabla profiles (NUEVO)
+// 7. Guardar datos en la tabla profiles
 async function saveProfile() {
     const name = document.getElementById('profileName').value;
     const bio = document.getElementById('profileBio').value;
     const avatar_url = document.getElementById('profileAvatar').value;
 
-    // upsert = "update" si existe, o "insert" si es nuevo
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('profiles')
         .upsert({
-            id: currentUserId, // Es obligatorio para saber de quién es el perfil
+            id: currentUserId, 
             name: name,
             bio: bio,
             avatar_url: avatar_url
@@ -176,9 +177,9 @@ async function saveProfile() {
     }
 }
 
-// 8. Comprobar si ya hay una sesión activa al cargar la página (Actualizado)
+// 8. Comprobar sesión activa
 window.onload = async () => {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await supabaseClient.auth.getSession();
     if (data.session) {
         showProfile(data.session.user);
     }
