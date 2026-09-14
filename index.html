@@ -1,188 +1,210 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil Social</title>
-    <!-- Importar Supabase vía CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 300px; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background-color: #1877f2; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px;}
-        button:hover { background-color: #166fe5; }
-        .register-btn { background-color: #42b72a; }
-        .register-btn:hover { background-color: #36a420; }
-        #profileSection { display: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aula Social 131 — Iniciar sesión</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { -webkit-tap-highlight-color: transparent; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4">
 
-    <!-- Sección de Login / Registro -->
-    <div class="card" id="authSection">
-        <h2 style="text-align: center; color: #1877f2;">Conectarse</h2>
-        <input type="email" id="email" placeholder="Correo electrónico" required>
-        <input type="password" id="password" placeholder="Contraseña" required>
-        <button onclick="login()">Iniciar Sesión</button>
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
-        <button class="register-btn" onclick="register()">Crear cuenta nueva</button>
-        <p id="msg" style="color: red; font-size: 14px; text-align: center;"></p>
+  <div class="w-full max-w-md">
+    <!-- Logo / Título -->
+    <div class="text-center mb-6">
+      <h1 class="text-4xl font-bold text-white drop-shadow-lg"> Aula 131</h1>
+      <p class="text-white/80 mt-2 text-sm">hola un gusto</p>
     </div>
-
-    <!-- Sección del Perfil Social -->
-    <div class="card" id="profileSection">
-        <h2>Mi Perfil</h2>
-        
-        <!-- Foto de perfil predeterminada CORREGIDA -->
-        <div style="text-align: center;">
-            <img id="avatarDisplay" src="https://ui-avatars.com/api/?name=Perfil&background=random" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+      <!-- Pestañas -->
+      <div class="flex mb-6 bg-slate-100 rounded-lg p-1">
+        <button id="tab-login" class="flex-1 py-2 rounded-md text-sm font-medium bg-white shadow text-indigo-600 transition">
+          Iniciar sesión
+        </button>
+        <button id="tab-register" class="flex-1 py-2 rounded-md text-sm font-medium text-slate-500 transition">
+          Registrarse
+        </button>
+      </div>
+       <!-- LOGIN -->
+      <form id="form-login" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Correo electrónico</label>
+          <input id="login-email" type="email" required placeholder="tucorreo@ejemplo.com"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Contraseña</label>
+          <input id="login-password" type="password" required placeholder="••••••••"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition text-white font-medium py-2.5 rounded-lg shadow">
+          Entrar
+        </button>
+      </form>
 
-        <p style="text-align: center; color: gray; font-size: 12px;">Cuenta: <span id="userEmail"></span></p>
-
-        <!-- Campos de la base de datos -->
-        <input type="text" id="profileName" placeholder="Tu nombre completo">
-        <input type="text" id="profileAvatar" placeholder="URL de tu foto (ej. https://...)">
-        <textarea id="profileBio" placeholder="Escribe tu biografía..." style="width: 90%; height: 60px; margin: 10px 0; padding: 10px; font-family: inherit; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-        
-        <button onclick="saveProfile()" style="background-color: #28a745;">Guardar Perfil</button>
-        
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
-        
-        <!-- Zona de publicaciones -->
-        <textarea placeholder="¿Qué estás pensando?" style="width: 90%; height: 40px; margin-bottom: 10px;"></textarea>
-        <button style="background-color: #1877f2;">Publicar (Próximamente)</button>
-        <button onclick="logout()" style="background-color: #dc3545; margin-top: 15px;">Cerrar Sesión</button>
+      <!-- REGISTRO -->
+      <form id="form-register" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Nombre completo</label>
+          <input id="reg-fullname" type="text" required placeholder="Edmar Quispe"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Nombre de usuario</label>
+          <input id="reg-username" type="text" required placeholder="ana_gomez"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Correo electrónico</label>
+          <input id="reg-email" type="email" required placeholder="tucorreo@ejemplo.com"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Contraseña (mín. 6 caracteres)</label>
+          <input id="reg-password" type="password" required minlength="6" placeholder="••••••••"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit"
+          class="w-full bg-pink-600 hover:bg-pink-700 active:scale-95 transition text-white font-medium py-2.5 rounded-lg shadow">
+          Crear cuenta
+        </button>
+      </form>
+         <!-- Mensaje de estado -->
+      <p id="mensaje" class="mt-4 text-center text-sm text-slate-500"></p>
     </div>
 
-    <script>
-        // 1. Configurar Supabase
+    <p class="text-center text-white/70 text-xs mt-6">
+      Al continuar, aceptas nuestros términos y política de privacidad.
+    </p>
+  </div>
+
+  <script>
+    (function() {
+      // ============================================================
+      //  CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = 'https://urpkgcvlgdesdwkyhdqo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVycGtnY3ZsZ2Rlc2R3a3loZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MTA0NDEsImV4cCI6MjEwNDk4NjQ0MX0.pP3lryKAT973Bo_ke6wkQ2f3TSCsggXfsfnDniAYQ4A';
-        
-        // CORRECCIÓN: Se eliminó la línea "const supabase = ..." duplicada
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // URL de tu Google Apps Script
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLHhVbltHL1Y5smLTEX5XGn_qQHsCnoQonu8WkCrgoTYa305yHb1XTPhT3XvyPRkPM/exec';
+        // ============================================================
+      //  REFERENCIAS DOM
+      // ============================================================
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const formLogin = document.getElementById('form-login');
+      const formRegister = document.getElementById('form-register');
+      const mensajeEl = document.getElementById('mensaje');
 
-        let currentUserId = null; 
+      // ============================================================
+      //  CAMBIO DE PESTAÑAS (Login <-> Registro)
+      // ============================================================
+      tabLogin.addEventListener('click', () => {
+        formLogin.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        tabLogin.className = 'flex-1 py-2 rounded-md text-sm font-medium bg-white shadow text-indigo-600 transition';
+        tabRegister.className = 'flex-1 py-2 rounded-md text-sm font-medium text-slate-500 transition';
+        mensajeEl.textContent = '';
+      });
 
-        // 2. Función de Registro Directo
-        async function register() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-            });
+      tabRegister.addEventListener('click', () => {
+        formRegister.classList.remove('hidden');
+        formLogin.classList.add('hidden');
+        tabRegister.className = 'flex-1 py-2 rounded-md text-sm font-medium bg-white shadow text-pink-600 transition';
+        tabLogin.className = 'flex-1 py-2 rounded-md text-sm font-medium text-slate-500 transition';
+        mensajeEl.textContent = '';
+      });
 
-            if (error) {
-                document.getElementById('msg').innerText = error.message;
-            } else {
-                document.getElementById('msg').style.color = "green";
-                document.getElementById('msg').innerText = "¡Registro exitoso! Entrando...";
-                
-                fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, action: 'Nuevo Registro' })
-                });
+      // ============================================================
+      //  UTILIDAD: mostrar mensajes
+      // ============================================================
+      function mostrarMensaje(texto, esError = false) {
+        mensajeEl.textContent = texto;
+        mensajeEl.className = `mt-4 text-center text-sm ${esError ? 'text-red-500' : 'text-emerald-600'}`;
+      }
 
-                showProfile(data.user); 
+      // ============================================================
+      //  REGISTRO DE USUARIO
+      // ============================================================
+      formRegister.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('reg-fullname').value.trim();
+        const username = document.getElementById('reg-username').value.trim().toLowerCase();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+
+        if (!fullName || !username || !email || !password) {
+          mostrarMensaje('Completa todos los campos.', true);
+          return;
+        }
+
+        mostrarMensaje('Creando cuenta…');
+
+        // signUp guarda el usuario en auth.users y dispara el trigger
+        // que crea automáticamente su fila en la tabla profiles.
+        const { data, error } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {                    // metadatos que leerá el trigger
+              username: username,
+              full_name: fullName
             }
+          }
+        });
+
+        if (error) {
+          mostrarMensaje('Error: ' + error.message, true);
+          return;
         }
 
-        // 3. Función de Login
-        async function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
+        // Dependiendo de la configuración de Supabase, el usuario
+        // puede necesitar confirmar su correo antes de entrar.
+        if (data.user && !data.session) {
+          mostrarMensaje('Cuenta creada. Revisa tu correo para confirmar.');
+        } else {
+          mostrarMensaje('¡Bienvenido! Redirigiendo…');
+          setTimeout(() => window.location.href = 'feed.html', 1200);
+        }
+      });
 
-            if (error) {
-                document.getElementById('msg').innerText = error.message;
-            } else {
-                showProfile(data.user); 
-            }
+      // ============================================================
+      //  LOGIN DE USUARIO
+      // ============================================================
+      formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        mostrarMensaje('Iniciando sesión…');
+
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          mostrarMensaje('Credenciales incorrectas. Intenta de nuevo.', true);
+          return;
         }
 
-        // 4. Cerrar Sesión
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            document.getElementById('authSection').style.display = 'block';
-            document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-        }
+        mostrarMensaje('¡Bienvenido de vuelta! Redirigiendo…');
+        setTimeout(() => window.location.href = 'feed.html', 800);
+      });
 
-        // 5. Mostrar la vista del perfil
-        function showProfile(user) {
-            currentUserId = user.id; 
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('profileSection').style.display = 'block';
-            document.getElementById('userEmail').innerText = user.email;
-            
-            loadProfile();
-        }
-
-        // 6. Leer datos de la tabla profiles
-        async function loadProfile() {
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('name, bio, avatar_url')
-                .eq('id', currentUserId)
-                .single(); 
-
-            if (data) {
-                document.getElementById('profileName').value = data.name || '';
-                document.getElementById('profileBio').value = data.bio || '';
-                document.getElementById('profileAvatar').value = data.avatar_url || '';
-                
-                if (data.avatar_url) {
-                    document.getElementById('avatarDisplay').src = data.avatar_url;
-                }
-            }
-        }
-
-        // 7. Guardar datos en la tabla profiles
-        async function saveProfile() {
-            const name = document.getElementById('profileName').value;
-            const bio = document.getElementById('profileBio').value;
-            const avatar_url = document.getElementById('profileAvatar').value;
-
-            const { error } = await supabaseClient
-                .from('profiles')
-                .upsert({
-                    id: currentUserId, 
-                    name: name,
-                    bio: bio,
-                    avatar_url: avatar_url
-                });
-
-            if (error) {
-                alert('Error al guardar: ' + error.message);
-            } else {
-                alert('¡Perfil guardado correctamente!');
-                if (avatar_url) {
-                    document.getElementById('avatarDisplay').src = avatar_url;
-                }
-            }
-        }
-
-        // 8. Comprobar sesión activa
-        window.onload = async () => {
-            const { data } = await supabaseClient.auth.getSession();
-            if (data.session) {
-                showProfile(data.session.user);
-            }
-        };
-    </script>
+      // ============================================================
+      //  SI YA HAY SESIÓN ACTIVA, REDIRIGIR AL FEED
+      // ============================================================
+      sb.auth.getSession().then(({ data: { session } }) => {
+        if (session) window.location.href = 'feed.html';
+      });
+    })();
+  </script>
 </body>
 </html>
+    
+       
+    
+   
