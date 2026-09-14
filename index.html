@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil Social</title>
+    <!-- Importar Supabase vía CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background-color: #1877f2; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px;}
+        button:hover { background-color: #166fe5; }
+        .register-btn { background-color: #42b72a; }
+        .register-btn:hover { background-color: #36a420; }
+        #profileSection { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Sección de Login / Registro -->
+    <div class="card" id="authSection">
+        <h2 style="text-align: center; color: #1877f2;">Conectarse</h2>
+        <input type="email" id="email" placeholder="Correo electrónico" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button onclick="login()">Iniciar Sesión</button>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+        <button class="register-btn" onclick="register()">Crear cuenta nueva</button>
+        <p id="msg" style="color: red; font-size: 14px; text-align: center;"></p>
+    </div>
+
+    <!-- Sección del Perfil Social -->
+    <div class="card" id="profileSection">
+        <h2>Mi Perfil</h2>
+        <p>Bienvenido, <span id="userEmail"></span></p>
+        <textarea placeholder="¿Qué estás pensando?" style="width: 90%; height: 60px; margin-bottom: 10px;"></textarea>
+        <button style="background-color: #1877f2;">Publicar</button>
+        <button onclick="logout()" style="background-color: #dc3545; margin-top: 15px;">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        // 1. Configurar Supabase (REEMPLAZA ESTO CON TUS DATOS)
+        const SUPABASE_URL = 'https://urpkgcvlgdesdwkyhdqo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVycGtnY3ZsZ2Rlc2R3a3loZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MTA0NDEsImV4cCI6MjEwNDk4NjQ0MX0.pP3lryKAT973Bo_ke6wkQ2f3TSCsggXfsfnDniAYQ4A';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // URL de tu Google Apps Script (REEMPLAZA ESTO CON TU URL)
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzk9imJbf0gh_VFgh1MC06SPCGfny5SBukCGToaXpJRj9Zazd0mTPXNJxC7fj9FgXzp/exec';
+
+        // 2. Función de Registro Directo
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                document.getElementById('msg').innerText = error.message;
+            } else {
+                document.getElementById('msg').style.color = "green";
+                document.getElementById('msg').innerText = "¡Registro exitoso! Entrando...";
+                
+                // Enviar log a Google Apps Script
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, action: 'Nuevo Registro' })
+                });
+
+                showProfile(data.user.email);
+            }
+        }
+
+        // 3. Función de Login
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                document.getElementById('msg').innerText = error.message;
+            } else {
+                showProfile(data.user.email);
+            }
+        }
+
+        // 4. Cerrar Sesión
+        async function logout() {
+            await supabase.auth.signOut();
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // 5. Mostrar la vista del perfil
+        function showProfile(email) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'block';
+            document.getElementById('userEmail').innerText = email;
+        }
+
+        // Comprobar si ya hay una sesión activa al cargar la página
+        window.onload = async () => {
+            const { data } = await supabase.auth.getSession();
+            if (data.session) {
+                showProfile(data.session.user.email);
+            }
+        };
+    </script>
+</body>
+</html>
