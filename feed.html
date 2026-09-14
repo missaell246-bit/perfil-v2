@@ -1,0 +1,3857 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Red131 | Inicio</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #f3f6fa;
+            color: #172033;
+            font-family: Arial, Helvetica, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* =========================================
+           BARRA SUPERIOR
+        ========================================= */
+
+        .topbar {
+            background: rgba(255,255,255,.96);
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 2px 15px rgba(15,23,42,.06);
+            backdrop-filter: blur(15px);
+        }
+
+        .topbar-inner {
+            max-width: 1180px;
+            margin: auto;
+            min-height: 66px;
+            padding: 0 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .brand {
+            color: #2563eb;
+            font-size: 25px;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: -1px;
+            white-space: nowrap;
+        }
+
+        .desktop-menu {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .menu-link {
+            text-decoration: none;
+            color: #64748b;
+            padding: 9px 11px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        .menu-link:hover,
+        .menu-link.active {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .right-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* =========================================
+           PERFIL SUPERIOR
+        ========================================= */
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 8px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #334155;
+            transition: .2s;
+        }
+
+        .profile-link:hover {
+            background: #f1f5f9;
+        }
+
+        .user-name {
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           AVATARES
+        ========================================= */
+
+        .avatar {
+            width: 43px;
+            height: 43px;
+            min-width: 43px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,#2563eb,#7c3aed);
+            color: white;
+            font-weight: 800;
+            font-size: 15px;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(15,23,42,.12);
+        }
+
+        .avatar-lg {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            font-size: 19px;
+        }
+
+        .avatar-sm {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            font-size: 12px;
+        }
+
+        /* =========================================
+           NOTIFICACIONES
+        ========================================= */
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        #btn-notif {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: .2s;
+            position: relative;
+        }
+
+        #btn-notif:hover {
+            background: #f1f5f9;
+        }
+
+        #notif-count {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 99px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        #notif-count.hidden {
+            display: none;
+        }
+
+        #notif-panel {
+            position: absolute;
+            right: 0;
+            top: 48px;
+            width: 350px;
+            max-height: 450px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 17px;
+            box-shadow: 0 15px 40px rgba(15,23,42,.16);
+            z-index: 100;
+        }
+
+        #notif-panel.hidden {
+            display: none;
+        }
+
+        .notif-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: white;
+            padding: 14px;
+            border-bottom: 1px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* =========================================
+           BOTÓN SALIR
+        ========================================= */
+
+        #btn-logout {
+            border: none;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 8px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        #btn-logout:hover {
+            background: #fecaca;
+        }
+
+        /* =========================================
+           MENÚ MÓVIL
+        ========================================= */
+
+        .mobile-menu {
+            display: none;
+            border-top: 1px solid #eef2f7;
+            padding: 9px 12px;
+            overflow-x: auto;
+            gap: 6px;
+        }
+
+        .mobile-menu .menu-link {
+            font-size: 12px;
+        }
+
+        /* =========================================
+           CONTENIDO
+        ========================================= */
+
+        .main {
+            width: 100%;
+            max-width: 720px;
+            margin: auto;
+            padding: 22px 14px 60px;
+        }
+
+        /* =========================================
+           PUBLICADOR
+        ========================================= */
+
+        .composer {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 5px 20px rgba(15,23,42,.055);
+            margin-bottom: 16px;
+        }
+
+        .composer-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .composer-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #post-content {
+            width: 100%;
+            min-height: 76px;
+            resize: vertical;
+            border: 0;
+            outline: none;
+            background: #f8fafc;
+            border-radius: 13px;
+            padding: 13px;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #post-content:focus {
+            background: white;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.12);
+        }
+
+        #post-content::placeholder {
+            color: #94a3b8;
+        }
+
+        .composer-bottom {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .photo-label {
+            cursor: pointer;
+            color: #64748b;
+            padding: 8px 10px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: .2s;
+        }
+
+        .photo-label:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        #btn-publicar {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37,99,235,.2);
+            transition: .2s;
+        }
+
+        #btn-publicar:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        #btn-publicar:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #post-image-preview {
+            margin-top: 10px;
+            position: relative;
+        }
+
+        #post-image-preview.hidden {
+            display: none;
+        }
+
+        #post-image-preview-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 13px;
+            border: 1px solid #e5e7eb;
+        }
+
+        #btn-quitar-imagen {
+            margin-top: 6px;
+            border: none;
+            background: transparent;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           PUBLICACIONES
+        ========================================= */
+
+        #posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .post-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 5px 20px rgba(15,23,42,.05);
+            transition: .2s;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 8px 27px rgba(15,23,42,.075);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            margin-bottom: 13px;
+        }
+
+        .post-author {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .post-author-name {
+            color: #172033;
+            font-weight: 800;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-author-meta {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .delete-button {
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 7px;
+            transition: .2s;
+        }
+
+        .delete-button:hover {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .post-content {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin-bottom: 13px;
+        }
+
+        .post-image {
+            display: block;
+            width: 100%;
+            max-height: 520px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 13px;
+        }
+
+        /* =========================================
+           ACCIONES
+        ========================================= */
+
+        .post-actions {
+            border-top: 1px solid #eef2f7;
+            padding-top: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-button {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            padding: 7px 11px;
+            border-radius: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .action-button:hover {
+            background: #f8fafc;
+        }
+
+        .like-active {
+            color: #ef4444 !important;
+        }
+
+        .comment-active {
+            color: #2563eb !important;
+        }
+
+        /* =========================================
+           COMENTARIOS
+        ========================================= */
+
+        .comments-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .comments-section.hidden {
+            display: none;
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .comment-bubble {
+            flex: 1;
+            min-width: 0;
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 8px 11px;
+        }
+
+        .comment-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .comment-user {
+            color: #334155;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .comment-time {
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 400;
+        }
+
+        .comment-text {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+
+        .comment-delete {
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .comment-delete:hover {
+            color: #ef4444;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            margin-top: 11px;
+        }
+
+        .comment-input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 99px;
+            padding: 9px 13px;
+            outline: none;
+            font-size: 12px;
+        }
+
+        .comment-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.1);
+        }
+
+        .comment-send {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        .comment-send:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+        .show-comments {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        /* =========================================
+           TOAST
+        ========================================= */
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            transform: translate(-50%,30px);
+            background: #172033;
+            color: white;
+            padding: 11px 21px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translate(-50%,0);
+        }
+
+        /* =========================================
+           ESTADOS
+        ========================================= */
+
+        .loading-box,
+        .empty-box,
+        .error-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 35px 20px;
+            text-align: center;
+        }
+
+        .empty-title {
+            color: #334155;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .empty-text {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .error-box {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+            font-size: 13px;
+        }
+
+        .spinner {
+            width: 27px;
+            height: 27px;
+            border: 3px solid #dbeafe;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 1050px) {
+
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar-inner {
+                min-height: 60px;
+                padding: 0 10px;
+            }
+
+            .brand {
+                font-size: 21px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            #btn-logout {
+                padding: 7px 8px;
+                font-size: 11px;
+            }
+
+            #notif-panel {
+                position: fixed;
+                top: 62px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-height: 70vh;
+            }
+
+            .main {
+                padding: 13px 10px 50px;
+            }
+
+            .composer,
+            .post-card {
+                border-radius: 15px;
+                padding: 14px;
+            }
+
+            .composer-row {
+                gap: 9px;
+            }
+
+            .avatar {
+                width: 39px;
+                height: 39px;
+                min-width: 39px;
+            }
+
+            .avatar-sm {
+                width: 30px;
+                height: 30px;
+                min-width: 30px;
+            }
+
+            #post-content {
+                min-height: 65px;
+                font-size: 13px;
+            }
+
+            .photo-label span {
+                display: none;
+            }
+
+            #btn-publicar {
+                padding: 9px 15px;
+            }
+
+            .post-content {
+                font-size: 13px;
+            }
+
+            .action-button {
+                padding: 7px 8px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     BARRA SUPERIOR
+====================================================== -->
+
+<header class="topbar">
+
+    <div class="topbar-inner">
+
+        <a href="feed.html" class="brand">
+            Red131
+        </a>
+
+
+        <!-- MENÚ ESCRITORIO -->
+
+        <nav class="desktop-menu">
+
+            <a href="feed.html" class="menu-link active">
+                🏠 Inicio
+            </a>
+
+            <a href="friends.html" class="menu-link">
+                👥 Amigos
+            </a>
+
+            <a href="chat.html" class="menu-link">
+                💬 Mensajes
+            </a>
+
+            <a href="https://edmarquis1.github.io/REGISTRO-DE-DE-ESTUDIANTES/"
+               target="_blank"
+               class="menu-link">
+                🎓 Estudiantes
+            </a>
+
+            <a href="https://edmarquis1.github.io/Usalesiana/"
+               target="_blank"
+               class="menu-link">
+                🧮 Calculadora
+            </a>
+
+            <a href="https://edmarquis1.github.io/PERFILES/"
+               target="_blank"
+               class="menu-link">
+                🐾 Mascotas
+            </a>
+
+        </nav>
+
+
+        <!-- DERECHA -->
+
+        <div class="right-menu">
+
+            <!-- NOTIFICACIONES -->
+
+            <div class="notification-wrapper">
+
+                <button id="btn-notif" title="Notificaciones">
+
+                    <svg width="21"
+                         height="21"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032
+                            2.032 0 0118 14.158V11a6.002
+                            6.002 0 00-4-5.659V5a2 2 0 10-4
+                            0v.341C7.67 6.165 6 8.388
+                            6 11v3.159c0 .538-.214
+                            1.055-.595 1.436L4 17h5m6
+                            0v1a3 3 0 11-6 0v-1m6 0H9"/>
+
+                    </svg>
+
+                    <span id="notif-count" class="hidden">
+                        0
+                    </span>
+
+                </button>
+
+
+                <div id="notif-panel" class="hidden">
+
+                    <div class="notif-header">
+
+                        <strong style="font-size:13px;">
+                            🔔 Notificaciones
+                        </strong>
+
+                        <button
+                            id="btn-marcar-leidas"
+                            style="
+                            border:none;
+                            background:transparent;
+                            color:#2563eb;
+                            cursor:pointer;
+                            font-size:11px;
+                            font-weight:700;
+                            ">
+
+                            Marcar leídas
+
+                        </button>
+
+                    </div>
+
+                    <div id="notif-list">
+
+                        <p style="
+                            text-align:center;
+                            color:#94a3b8;
+                            font-size:13px;
+                            padding:25px;
+                            ">
+
+                            Sin notificaciones.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PERFIL -->
+
+            <a href="profile.html"
+               id="link-perfil"
+               class="profile-link">
+
+                <div id="avatar-header"
+                     class="avatar">
+
+                    ?
+
+                </div>
+
+                <span id="user-name"
+                      class="user-name">
+                </span>
+
+            </a>
+
+
+            <!-- SALIR -->
+
+            <button id="btn-logout">
+                Salir
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- MENÚ MÓVIL -->
+
+    <nav class="mobile-menu">
+
+        <a href="feed.html"
+           class="menu-link active">
+            🏠 Inicio
+        </a>
+
+        <a href="friends.html"
+           class="menu-link">
+            👥 Amigos
+        </a>
+
+        <a href="chat.html"
+           class="menu-link">
+            💬 Mensajes
+        </a>
+
+        <a href="https://edmarquis1.github.io/REGISTRO-DE-DE-ESTUDIANTES/"
+           target="_blank"
+           class="menu-link">
+            🎓 Estudiantes
+        </a>
+
+        <a href="https://edmarquis1.github.io/Usalesiana/"
+           target="_blank"
+           class="menu-link">
+            🧮 Calculadora
+        </a>
+
+        <a href="https://edmarquis1.github.io/PERFILES/"
+           target="_blank"
+           class="menu-link">
+            🐾 Mascotas
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- =====================================================
+     CONTENIDO
+====================================================== -->
+
+<main class="main">
+
+
+    <!-- =================================================
+         CREAR PUBLICACIÓN
+    ================================================== -->
+
+    <section class="composer">
+
+        <div class="composer-row">
+
+            <div id="avatar-composer"
+                 class="avatar">
+
+                ?
+
+            </div>
+
+
+            <div class="composer-content">
+
+                <textarea
+                    id="post-content"
+                    rows="2"
+                    maxlength="5000"
+                    placeholder="¿Qué estás pensando?">
+                </textarea>
+
+
+                <!-- PREVISUALIZACIÓN -->
+
+                <div id="post-image-preview"
+                     class="hidden">
+
+                    <img id="post-image-preview-img"
+                         src=""
+                         alt="Vista previa">
+
+                    <button id="btn-quitar-imagen">
+                        ✕ Quitar imagen
+                    </button>
+
+                </div>
+
+
+                <div class="composer-bottom">
+
+                    <label
+                        for="post-image"
+                        class="photo-label">
+
+                        <svg width="20"
+                             height="20"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 16l4.586-4.586a2
+                                2 0 012.828 0L16 16m-2-2
+                                l1.586-1.586a2 2 0
+                                012.828 0L20 14m-6-6h.01
+                                M6 20h12a2 2 0
+                                002-2V6a2 2 0
+                                00-2-2H6a2 2
+                                0 00-2 2v12a2 2
+                                0 002 2z"/>
+
+                        </svg>
+
+                        <span>
+                            Foto
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="file"
+                        id="post-image"
+                        accept="image/*"
+                        style="display:none;">
+
+
+                    <button id="btn-publicar">
+
+                        Publicar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         PUBLICACIONES
+    ================================================== -->
+
+    <section id="posts-container">
+
+        <div class="loading-box">
+
+            <div class="spinner"></div>
+
+            <p style="
+                margin-top:12px;
+                color:#94a3b8;
+                font-size:13px;
+                ">
+
+                Cargando publicaciones...
+
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    /* =====================================================
+       CONFIGURACIÓN DE LA NUEVA SUPABASE
+    ====================================================== */
+
+    const SUPABASE_URL =
+        "NUEVA_SUPABASE_URL";
+
+    const SUPABASE_ANON_KEY =
+        "NUEVA_SUPABASE_ANON_KEY";
+
+
+    let sb = null;
+
+
+    /*
+     * No intentamos conectarnos hasta que
+     * coloquemos las credenciales nuevas.
+     */
+
+    if (
+        SUPABASE_URL !== "NUEVA_SUPABASE_URL" &&
+        SUPABASE_ANON_KEY !== "NUEVA_SUPABASE_ANON_KEY"
+    ) {
+
+        sb = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+    }
+
+
+    /* =====================================================
+       VARIABLES
+    ====================================================== */
+
+    let currentUser = null;
+
+    let currentProfile = null;
+
+    let imagenBase64 = "";
+
+    let notificaciones = [];
+
+    let toastTimer = null;
+
+    let realtimeChannel = null;
+
+
+    /* =====================================================
+       ELEMENTOS
+    ====================================================== */
+
+    const toastEl =
+        document.getElementById("toast");
+
+    const postsContainer =
+        document.getElementById("posts-container");
+
+
+    /* =====================================================
+       TOAST
+    ====================================================== */
+
+    function mostrarToast(
+        mensaje,
+        esError = false
+    ) {
+
+        toastEl.textContent = mensaje;
+
+        toastEl.style.background =
+            esError
+                ? "#991b1b"
+                : "#172033";
+
+        toastEl.classList.add("visible");
+
+        clearTimeout(toastTimer);
+
+        toastTimer =
+            setTimeout(
+                function () {
+
+                    toastEl.classList.remove(
+                        "visible"
+                    );
+
+                },
+                2800
+            );
+
+    }
+
+
+    /* =====================================================
+       ESCAPAR HTML
+    ====================================================== */
+
+    function escapeHtml(texto) {
+
+        const elemento =
+            document.createElement("div");
+
+        elemento.textContent =
+            texto || "";
+
+        return elemento.innerHTML;
+
+    }
+
+
+    /* =====================================================
+       TIEMPO RELATIVO
+    ====================================================== */
+
+    function tiempoRelativo(fechaISO) {
+
+        if (!fechaISO) {
+            return "";
+        }
+
+        const ahora =
+            new Date();
+
+        const fecha =
+            new Date(fechaISO);
+
+        const segundos =
+            Math.floor(
+                (ahora - fecha) / 1000
+            );
+
+
+        if (segundos < 60) {
+
+            return "hace unos segundos";
+
+        }
+
+
+        if (segundos < 3600) {
+
+            return (
+                "hace " +
+                Math.floor(segundos / 60) +
+                " min"
+            );
+
+        }
+
+
+        if (segundos < 86400) {
+
+            return (
+                "hace " +
+                Math.floor(segundos / 3600) +
+                " h"
+            );
+
+        }
+
+
+        if (segundos < 604800) {
+
+            return (
+                "hace " +
+                Math.floor(segundos / 86400) +
+                " d"
+            );
+
+        }
+
+
+        return fecha.toLocaleDateString(
+            "es-BO"
+        );
+
+    }
+
+
+    /* =====================================================
+       AVATAR
+    ====================================================== */
+
+    function renderAvatar(
+        perfil,
+        size = ""
+    ) {
+
+        if (!perfil) {
+
+            return `
+                <div class="avatar ${size}">
+                    ?
+                </div>
+            `;
+
+        }
+
+
+        if (perfil.avatar_url) {
+
+            return `
+                <img
+                    src="${escapeHtml(perfil.avatar_url)}"
+                    class="avatar ${size}"
+                    alt="Avatar">
+            `;
+
+        }
+
+
+        const nombre =
+            perfil.full_name ||
+            perfil.username ||
+            "?";
+
+
+        const inicial =
+            nombre
+                .charAt(0)
+                .toUpperCase();
+
+
+        return `
+            <div class="avatar ${size}">
+                ${escapeHtml(inicial)}
+            </div>
+        `;
+
+    }
+
+
+    /* =====================================================
+       INICIO
+    ====================================================== */
+
+    async function iniciar() {
+
+        /*
+         * Si todavía no configuramos la nueva Supabase,
+         * dejamos visible el mensaje de configuración.
+         */
+
+        if (!sb) {
+
+            postsContainer.innerHTML = `
+
+                <div class="error-box">
+
+                    <strong>
+                        Nueva Supabase pendiente
+                    </strong>
+
+                    <p style="
+                        margin-top:7px;
+                        color:#b91c1c;
+                        ">
+
+                        La conexión con la nueva base
+                        de datos todavía no está configurada.
+
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        try {
+
+            const {
+                data: {
+                    session
+                }
+            } =
+                await sb.auth.getSession();
+
+
+            if (!session) {
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            currentUser =
+                session.user;
+
+
+            const {
+                data: perfil,
+                error: perfilError
+            } =
+                await sb
+                    .from("profiles")
+                    .select("*")
+                    .eq("id", currentUser.id)
+                    .maybeSingle();
+
+
+            if (perfilError) {
+
+                console.error(
+                    "Error cargando perfil:",
+                    perfilError
+                );
+
+            }
+
+
+            currentProfile =
+                perfil || null;
+
+
+            const nombre =
+                perfil?.full_name ||
+                perfil?.username ||
+                currentUser.email ||
+                "Usuario";
+
+
+            document.getElementById(
+                "user-name"
+            ).textContent = nombre;
+
+
+            document.getElementById(
+                "avatar-header"
+            ).outerHTML =
+                renderAvatar(perfil);
+
+
+            document.getElementById(
+                "avatar-composer"
+            ).outerHTML =
+                renderAvatar(
+                    perfil,
+                    "avatar-lg"
+                );
+
+
+            await cargarPosts();
+
+            await cargarNotificaciones();
+
+            enlazarNotificaciones();
+
+            iniciarRealtime();
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            mostrarError(
+                "No se pudo cargar el muro."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       REALTIME
+    ====================================================== */
+
+    function iniciarRealtime() {
+
+        if (!sb || !currentUser) {
+            return;
+        }
+
+
+        if (realtimeChannel) {
+
+            sb.removeChannel(
+                realtimeChannel
+            );
+
+        }
+
+
+        realtimeChannel =
+            sb.channel(
+                "red131-feed-" +
+                currentUser.id
+            );
+
+
+        realtimeChannel
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "posts"
+                },
+                function () {
+
+                    if (currentUser) {
+
+                        cargarPosts();
+
+                    }
+
+                }
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "comments"
+                },
+                function () {
+
+                    if (currentUser) {
+
+                        cargarPosts();
+
+                    }
+
+                }
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "likes"
+                },
+                function () {
+
+                    if (currentUser) {
+
+                        cargarPosts();
+
+                    }
+
+                }
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "notifications",
+                    filter:
+                        "user_id=eq." +
+                        currentUser.id
+                },
+                function () {
+
+                    if (currentUser) {
+
+                        cargarNotificaciones();
+
+                    }
+
+                }
+            )
+            .subscribe();
+
+    }
+
+
+    /* =====================================================
+       CARGAR POSTS
+    ====================================================== */
+
+    async function cargarPosts() {
+
+        if (!sb || !currentUser) {
+            return;
+        }
+
+
+        const {
+            data: posts,
+            error
+        } =
+            await sb
+                .from("posts")
+                .select("*")
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(50);
+
+
+        if (error) {
+
+            console.error(error);
+
+            mostrarError(
+                "No se pudieron cargar las publicaciones."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !posts ||
+            posts.length === 0
+        ) {
+
+            postsContainer.innerHTML = `
+
+                <div class="empty-box">
+
+                    <div style="
+                        font-size:35px;
+                        margin-bottom:10px;
+                        ">
+                        📝
+                    </div>
+
+                    <div class="empty-title">
+                        No hay publicaciones todavía
+                    </div>
+
+                    <div class="empty-text">
+                        ¡Sé el primero en compartir algo!
+                    </div>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           PERFILES
+        --------------------------------------------- */
+
+        const userIds =
+            [
+                ...new Set(
+                    posts.map(
+                        post =>
+                            post.user_id
+                    )
+                )
+            ];
+
+
+        const {
+            data: profiles
+        } =
+            await sb
+                .from("profiles")
+                .select("*")
+                .in(
+                    "id",
+                    userIds
+                );
+
+
+        const profilesMap = {};
+
+
+        if (profiles) {
+
+            profiles.forEach(
+                profile => {
+
+                    profilesMap[
+                        profile.id
+                    ] = profile;
+
+                }
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           LIKES
+        --------------------------------------------- */
+
+        const postIds =
+            posts.map(
+                post => post.id
+            );
+
+
+        const {
+            data: likes
+        } =
+            await sb
+                .from("likes")
+                .select("*")
+                .in(
+                    "post_id",
+                    postIds
+                );
+
+
+        const likesMap = {};
+
+
+        if (likes) {
+
+            likes.forEach(
+                like => {
+
+                    if (
+                        !likesMap[
+                            like.post_id
+                        ]
+                    ) {
+
+                        likesMap[
+                            like.post_id
+                        ] = [];
+
+                    }
+
+
+                    likesMap[
+                        like.post_id
+                    ].push(like);
+
+                }
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           COMENTARIOS
+        --------------------------------------------- */
+
+        const {
+            data: comments
+        } =
+            await sb
+                .from("comments")
+                .select("*")
+                .in(
+                    "post_id",
+                    postIds
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+        const commentsMap = {};
+
+        const commentUserIds =
+            new Set();
+
+
+        if (comments) {
+
+            comments.forEach(
+                comment => {
+
+                    if (
+                        !commentsMap[
+                            comment.post_id
+                        ]
+                    ) {
+
+                        commentsMap[
+                            comment.post_id
+                        ] = [];
+
+                    }
+
+
+                    commentsMap[
+                        comment.post_id
+                    ].push(comment);
+
+
+                    commentUserIds.add(
+                        comment.user_id
+                    );
+
+                }
+            );
+
+        }
+
+
+        const otherUserIds =
+            [
+                ...commentUserIds
+            ]
+            .filter(
+                id =>
+                    !profilesMap[id]
+            );
+
+
+        if (
+            otherUserIds.length > 0
+        ) {
+
+            const {
+                data: otherProfiles
+            } =
+                await sb
+                    .from("profiles")
+                    .select("*")
+                    .in(
+                        "id",
+                        otherUserIds
+                    );
+
+
+            if (otherProfiles) {
+
+                otherProfiles.forEach(
+                    profile => {
+
+                        profilesMap[
+                            profile.id
+                        ] = profile;
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /* ---------------------------------------------
+           ENSAMBLAR
+        --------------------------------------------- */
+
+        const postsEnsamblados =
+            posts.map(
+                post => ({
+
+                    ...post,
+
+                    profiles:
+                        profilesMap[
+                            post.user_id
+                        ] || null,
+
+                    likes:
+                        likesMap[
+                            post.id
+                        ] || [],
+
+                    comments:
+                        commentsMap[
+                            post.id
+                        ] || []
+
+                })
+            );
+
+
+        postsContainer.innerHTML =
+            postsEnsamblados
+                .map(
+                    post =>
+                        renderPost(
+                            post,
+                            profilesMap
+                        )
+                )
+                .join("");
+
+
+        enlazarEventosPosts();
+
+    }
+
+
+    /* =====================================================
+       RENDER POST
+    ====================================================== */
+
+    function renderPost(
+        post,
+        profilesMap
+    ) {
+
+        const autor =
+            post.profiles || {};
+
+        const likes =
+            post.likes || [];
+
+        const comments =
+            post.comments || [];
+
+
+        const meGusta =
+            likes.some(
+                like =>
+                    like.user_id ===
+                    currentUser.id
+            );
+
+
+        const esMio =
+            post.user_id ===
+            currentUser.id;
+
+
+        const comentariosVisibles =
+            comments.slice(-2);
+
+
+        const hayMasComentarios =
+            comments.length > 2;
+
+
+        return `
+
+            <article
+                class="post-card"
+                data-post-id="${post.id}">
+
+                <div class="post-header">
+
+                    ${renderAvatar(autor)}
+
+
+                    <div class="post-author">
+
+                        <div class="post-author-name">
+
+                            ${escapeHtml(
+                                autor.full_name ||
+                                autor.username ||
+                                "Usuario"
+                            )}
+
+                        </div>
+
+
+                        <div class="post-author-meta">
+
+                            @${escapeHtml(
+                                autor.username ||
+                                "usuario"
+                            )}
+
+                            ·
+
+                            ${tiempoRelativo(
+                                post.created_at
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    ${
+                        esMio
+                        ?
+                        `
+
+                        <button
+                            class="delete-button btn-eliminar"
+                            title="Eliminar publicación">
+
+                            <svg
+                                width="17"
+                                height="17"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867
+                                    12.142A2 2
+                                    0 0116.138
+                                    21H7.862a2 2
+                                    0 01-1.995
+                                    -1.858L5 7m5
+                                    4v6m4-6v6m1
+                                    -10V4a1 1
+                                    0 00-1-1h-4a1
+                                    1 0 00-1 1v3M4
+                                    7h16"/>
+
+                            </svg>
+
+                        </button>
+
+                        `
+                        :
+                        ""
+                    }
+
+                </div>
+
+
+                <div class="post-content">
+
+                    ${escapeHtml(
+                        post.content || ""
+                    )}
+
+                </div>
+
+
+                ${
+                    post.image_url
+                    ?
+                    `
+
+                    <img
+                        src="${escapeHtml(
+                            post.image_url
+                        )}"
+                        class="post-image"
+                        alt="Imagen de publicación">
+
+                    `
+                    :
+                    ""
+                }
+
+
+                <div class="post-actions">
+
+                    <button
+                        class="
+                            action-button
+                            btn-like
+                            ${
+                                meGusta
+                                ?
+                                "like-active"
+                                :
+                                ""
+                            }
+                        ">
+
+                        <svg
+                            width="18"
+                            height="18"
+                            fill="${
+                                meGusta
+                                ?
+                                "currentColor"
+                                :
+                                "none"
+                            }"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4.318
+                                6.318a4.5
+                                4.5 0 000
+                                6.364L12
+                                20.364l7.682
+                                -7.682a4.5
+                                4.5 0 00-6.364
+                                -6.364L12
+                                7.636l-1.318
+                                -1.318a4.5
+                                4.5 0 00-6.364
+                                0z"/>
+
+                        </svg>
+
+                        <span>
+                            ${
+                                likes.length
+                                ?
+                                likes.length
+                                :
+                                ""
+                            }
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="
+                            action-button
+                            btn-toggle-comments
+                        ">
+
+                        <svg
+                            width="18"
+                            height="18"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 12h.01
+                                M12 12h.01
+                                M16 12h.01
+                                M21 12c0
+                                4.418-4.03
+                                8-9 8a9.863
+                                9.863 0
+                                01-4.255
+                                -.949L3
+                                20l1.395
+                                -3.72C3.512
+                                15.042 3
+                                13.574 3
+                                12c0-4.418
+                                4.03-8 9-8
+                                s9 3.582
+                                9 8z"/>
+
+                        </svg>
+
+                        <span>
+
+                            ${
+                                comments.length
+                                ?
+                                comments.length
+                                :
+                                ""
+                            }
+
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="
+                        comments-section
+                        hidden
+                    ">
+
+
+                    ${
+                        hayMasComentarios
+                        ?
+                        `
+
+                        <button
+                            class="show-comments btn-ver-todos">
+
+                            Ver los
+                            ${comments.length}
+                            comentarios
+
+                        </button>
+
+                        `
+                        :
+                        ""
+                    }
+
+
+                    <div
+                        class="comment-list comments-list">
+
+                        ${comentariosVisibles
+                            .map(
+                                comment =>
+                                    renderComentario(
+                                        comment,
+                                        profilesMap[
+                                            comment.user_id
+                                        ]
+                                    )
+                            )
+                            .join("")}
+
+                    </div>
+
+
+                    ${
+                        hayMasComentarios
+                        ?
+                        `
+
+                        <div
+                            class="
+                                comment-list
+                                comments-all
+                            "
+                            style="display:none;">
+
+                            ${comments
+                                .map(
+                                    comment =>
+                                        renderComentario(
+                                            comment,
+                                            profilesMap[
+                                                comment.user_id
+                                            ]
+                                        )
+                                )
+                                .join("")}
+
+                        </div>
+
+                        `
+                        :
+                        ""
+                    }
+
+
+                    <div class="comment-form">
+
+                        ${renderAvatar(
+                            currentProfile,
+                            "avatar-sm"
+                        )}
+
+
+                        <input
+                            type="text"
+                            maxlength="300"
+                            class="comment-input input-comentario"
+                            placeholder="Escribe un comentario...">
+
+
+                        <button
+                            class="comment-send comment-send-button btn-enviar-comentario"
+                            disabled>
+
+                            Enviar
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        `;
+
+    }
+
+
+    /* =====================================================
+       RENDER COMENTARIO
+    ====================================================== */
+
+    function renderComentario(
+        comentario,
+        perfil
+    ) {
+
+        const esMio =
+            comentario.user_id ===
+            currentUser.id;
+
+
+        return `
+
+            <div
+                class="comment-item"
+                data-comment-id="${comentario.id}">
+
+                ${renderAvatar(
+                    perfil,
+                    "avatar-sm"
+                )}
+
+
+                <div class="comment-bubble">
+
+                    <div class="comment-top">
+
+                        <div class="comment-user">
+
+                            ${escapeHtml(
+                                perfil?.full_name ||
+                                perfil?.username ||
+                                "Usuario"
+                            )}
+
+                            <span class="comment-time">
+
+                                ${tiempoRelativo(
+                                    comentario.created_at
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+                        ${
+                            esMio
+                            ?
+                            `
+
+                            <button
+                                class="comment-delete btn-eliminar-comentario">
+
+                                ✕
+
+                            </button>
+
+                            `
+                            :
+                            ""
+                        }
+
+                    </div>
+
+
+                    <div class="comment-text">
+
+                        ${escapeHtml(
+                            comentario.content
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =====================================================
+       EVENTOS DE POSTS
+    ====================================================== */
+
+    function enlazarEventosPosts() {
+
+        document
+            .querySelectorAll(
+                "article[data-post-id]"
+            )
+            .forEach(
+                function (article) {
+
+                    const postId =
+                        Number(
+                            article.dataset.postId
+                        );
+
+
+                    /* LIKE */
+
+                    article
+                        .querySelector(
+                            ".btn-like"
+                        )
+                        ?.addEventListener(
+                            "click",
+                            function () {
+
+                                toggleLike(
+                                    postId
+                                );
+
+                            }
+                        );
+
+
+                    /* ELIMINAR */
+
+                    article
+                        .querySelector(
+                            ".btn-eliminar"
+                        )
+                        ?.addEventListener(
+                            "click",
+                            function () {
+
+                                eliminarPost(
+                                    postId
+                                );
+
+                            }
+                        );
+
+
+                    /* COMENTARIOS */
+
+                    article
+                        .querySelector(
+                            ".btn-toggle-comments"
+                        )
+                        ?.addEventListener(
+                            "click",
+                            function () {
+
+                                const section =
+                                    article.querySelector(
+                                        ".comments-section"
+                                    );
+
+
+                                section
+                                    .classList
+                                    .toggle(
+                                        "hidden"
+                                    );
+
+
+                                if (
+                                    !section
+                                        .classList
+                                        .contains(
+                                            "hidden"
+                                        )
+                                ) {
+
+                                    setTimeout(
+                                        function () {
+
+                                            article
+                                                .querySelector(
+                                                    ".comment-input"
+                                                )
+                                                ?.focus();
+
+                                        },
+                                        50
+                                    );
+
+                                }
+
+                            }
+                        );
+
+
+                    /* VER TODOS */
+
+                    const btnVerTodos =
+                        article.querySelector(
+                            ".btn-ver-todos"
+                        );
+
+                    const listaNormal =
+                        article.querySelector(
+                            ".comments-list"
+                        );
+
+                    const listaCompleta =
+                        article.querySelector(
+                            ".comments-all"
+                        );
+
+
+                    btnVerTodos
+                        ?.addEventListener(
+                            "click",
+                            function () {
+
+                                if (
+                                    listaNormal
+                                ) {
+
+                                    listaNormal.style.display =
+                                        "none";
+
+                                }
+
+
+                                if (
+                                    listaCompleta
+                                ) {
+
+                                    listaCompleta.style.display =
+                                        "flex";
+
+                                }
+
+
+                                btnVerTodos.remove();
+
+                            }
+                        );
+
+
+                    /* INPUT */
+
+                    const input =
+                        article.querySelector(
+                            ".input-comentario"
+                        );
+
+                    const btnEnviar =
+                        article.querySelector(
+                            ".btn-enviar-comentario"
+                        );
+
+
+                    input
+                        ?.addEventListener(
+                            "input",
+                            function () {
+
+                                btnEnviar.disabled =
+                                    !input.value.trim();
+
+                            }
+                        );
+
+
+                    input
+                        ?.addEventListener(
+                            "keydown",
+                            function (event) {
+
+                                if (
+                                    event.key === "Enter" &&
+                                    !event.shiftKey &&
+                                    !btnEnviar.disabled
+                                ) {
+
+                                    event.preventDefault();
+
+                                    btnEnviar.click();
+
+                                }
+
+                            }
+                        );
+
+
+                    btnEnviar
+                        ?.addEventListener(
+                            "click",
+                            async function () {
+
+                                const texto =
+                                    input.value.trim();
+
+
+                                if (!texto) {
+                                    return;
+                                }
+
+
+                                btnEnviar.disabled =
+                                    true;
+
+
+                                await agregarComentario(
+                                    postId,
+                                    texto
+                                );
+
+                            }
+                        );
+
+
+                    /* ELIMINAR COMENTARIOS */
+
+                    article
+                        .querySelectorAll(
+                            ".btn-eliminar-comentario"
+                        )
+                        .forEach(
+                            function (button) {
+
+                                button.addEventListener(
+                                    "click",
+                                    function () {
+
+                                        const elemento =
+                                            button.closest(
+                                                "[data-comment-id]"
+                                            );
+
+
+                                        if (!elemento) {
+                                            return;
+                                        }
+
+
+                                        eliminarComentario(
+                                            Number(
+                                                elemento.dataset.commentId
+                                            )
+                                        );
+
+                                    }
+                                );
+
+                            }
+                        );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       LIKE
+    ====================================================== */
+
+    async function toggleLike(
+        postId
+    ) {
+
+        if (!currentUser) {
+            return;
+        }
+
+
+        const {
+            data: existente
+        } =
+            await sb
+                .from("likes")
+                .select("id")
+                .eq(
+                    "post_id",
+                    postId
+                )
+                .eq(
+                    "user_id",
+                    currentUser.id
+                )
+                .maybeSingle();
+
+
+        if (existente) {
+
+            await sb
+                .from("likes")
+                .delete()
+                .eq(
+                    "id",
+                    existente.id
+                );
+
+        }
+        else {
+
+            const {
+                error
+            } =
+                await sb
+                    .from("likes")
+                    .insert({
+
+                        post_id:
+                            postId,
+
+                        user_id:
+                            currentUser.id
+
+                    });
+
+
+            if (error) {
+
+                console.error(error);
+
+                mostrarToast(
+                    "No se pudo dar like.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            const {
+                data: post
+            } =
+                await sb
+                    .from("posts")
+                    .select("user_id")
+                    .eq(
+                        "id",
+                        postId
+                    )
+                    .single();
+
+
+            if (
+                post &&
+                post.user_id !==
+                currentUser.id
+            ) {
+
+                await sb
+                    .from("notifications")
+                    .insert({
+
+                        user_id:
+                            post.user_id,
+
+                        actor_id:
+                            currentUser.id,
+
+                        type:
+                            "like",
+
+                        post_id:
+                            postId
+
+                    });
+
+            }
+
+        }
+
+
+        await cargarPosts();
+
+    }
+
+
+    /* =====================================================
+       ELIMINAR POST
+    ====================================================== */
+
+    async function eliminarPost(
+        postId
+    ) {
+
+        if (
+            !confirm(
+                "¿Eliminar esta publicación?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await sb
+                .from("posts")
+                .delete()
+                .eq(
+                    "id",
+                    postId
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            mostrarToast(
+                "No se pudo eliminar.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        mostrarToast(
+            "Publicación eliminada."
+        );
+
+
+        await cargarPosts();
+
+    }
+
+
+    /* =====================================================
+       AGREGAR COMENTARIO
+    ====================================================== */
+
+    async function agregarComentario(
+        postId,
+        content
+    ) {
+
+        const {
+            error
+        } =
+            await sb
+                .from("comments")
+                .insert({
+
+                    post_id:
+                        postId,
+
+                    user_id:
+                        currentUser.id,
+
+                    content:
+                        content
+
+                });
+
+
+        if (error) {
+
+            console.error(error);
+
+            mostrarToast(
+                "Error al enviar comentario.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        const {
+            data: post
+        } =
+            await sb
+                .from("posts")
+                .select("user_id")
+                .eq(
+                    "id",
+                    postId
+                )
+                .single();
+
+
+        if (
+            post &&
+            post.user_id !==
+            currentUser.id
+        ) {
+
+            await sb
+                .from("notifications")
+                .insert({
+
+                    user_id:
+                        post.user_id,
+
+                    actor_id:
+                        currentUser.id,
+
+                    type:
+                        "comment",
+
+                    post_id:
+                        postId
+
+                });
+
+        }
+
+
+        await cargarPosts();
+
+    }
+
+
+    /* =====================================================
+       ELIMINAR COMENTARIO
+    ====================================================== */
+
+    async function eliminarComentario(
+        commentId
+    ) {
+
+        if (
+            !confirm(
+                "¿Eliminar este comentario?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await sb
+                .from("comments")
+                .delete()
+                .eq(
+                    "id",
+                    commentId
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            mostrarToast(
+                "No se pudo eliminar.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        await cargarPosts();
+
+    }
+
+
+    /* =====================================================
+       NOTIFICACIONES
+    ====================================================== */
+
+    async function cargarNotificaciones() {
+
+        if (!sb || !currentUser) {
+            return;
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await sb
+                .from("notifications")
+                .select("*")
+                .eq(
+                    "user_id",
+                    currentUser.id
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(30);
+
+
+        if (error) {
+
+            console.error(error);
+
+            return;
+
+        }
+
+
+        notificaciones =
+            data || [];
+
+
+        await pintarNotificaciones();
+
+    }
+
+
+    /* =====================================================
+       PINTAR NOTIFICACIONES
+    ====================================================== */
+
+    async function pintarNotificaciones() {
+
+        const listEl =
+            document.getElementById(
+                "notif-list"
+            );
+
+        const countEl =
+            document.getElementById(
+                "notif-count"
+            );
+
+
+        const noLeidas =
+            notificaciones.filter(
+                notification =>
+                    !notification.is_read
+            );
+
+
+        if (
+            noLeidas.length > 0
+        ) {
+
+            countEl.textContent =
+                noLeidas.length > 99
+                    ? "99+"
+                    : noLeidas.length;
+
+
+            countEl.classList.remove(
+                "hidden"
+            );
+
+        }
+        else {
+
+            countEl.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (
+            notificaciones.length === 0
+        ) {
+
+            listEl.innerHTML = `
+
+                <p style="
+                    text-align:center;
+                    color:#94a3b8;
+                    font-size:13px;
+                    padding:25px;
+                    ">
+
+                    Sin notificaciones.
+
+                </p>
+
+            `;
+
+            return;
+
+        }
+
+
+        const actorIds =
+            [
+                ...new Set(
+                    notificaciones.map(
+                        notification =>
+                            notification.actor_id
+                    )
+                )
+            ];
+
+
+        let perfiles = [];
+
+
+        if (actorIds.length > 0) {
+
+            const result =
+                await sb
+                    .from("profiles")
+                    .select("*")
+                    .in(
+                        "id",
+                        actorIds
+                    );
+
+
+            perfiles =
+                result.data || [];
+
+        }
+
+
+        const perfilesMap = {};
+
+
+        perfiles.forEach(
+            profile => {
+
+                perfilesMap[
+                    profile.id
+                ] = profile;
+
+            }
+        );
+
+
+        listEl.innerHTML =
+            notificaciones
+                .map(
+                    notification => {
+
+                        const actor =
+                            perfilesMap[
+                                notification.actor_id
+                            ] ||
+                            {
+                                full_name:
+                                    "Usuario",
+
+                                username:
+                                    "usuario"
+                            };
+
+
+                        let texto = "";
+
+                        let emoji = "🔔";
+
+
+                        if (
+                            notification.type ===
+                            "like"
+                        ) {
+
+                            emoji = "❤️";
+
+                            texto =
+                                `<strong>${
+                                    escapeHtml(
+                                        actor.full_name ||
+                                        actor.username
+                                    )
+                                }</strong>
+                                le dio like a tu publicación`;
+
+                        }
+                        else if (
+                            notification.type ===
+                            "comment"
+                        ) {
+
+                            emoji = "💬";
+
+                            texto =
+                                `<strong>${
+                                    escapeHtml(
+                                        actor.full_name ||
+                                        actor.username
+                                    )
+                                }</strong>
+                                comentó en tu publicación`;
+
+                        }
+                        else if (
+                            notification.type ===
+                            "friend_request"
+                        ) {
+
+                            emoji = "👥";
+
+                            texto =
+                                `<strong>${
+                                    escapeHtml(
+                                        actor.full_name ||
+                                        actor.username
+                                    )
+                                }</strong>
+                                te envió una solicitud de amistad`;
+
+                        }
+                        else if (
+                            notification.type ===
+                            "friend_accepted"
+                        ) {
+
+                            emoji = "🎉";
+
+                            texto =
+                                `<strong>${
+                                    escapeHtml(
+                                        actor.full_name ||
+                                        actor.username
+                                    )
+                                }</strong>
+                                aceptó tu solicitud`;
+
+                        }
+                        else {
+
+                            texto =
+                                "Tienes una nueva notificación.";
+
+                        }
+
+
+                        return `
+
+                            <div style="
+                                padding:12px;
+                                border-bottom:1px solid #f1f5f9;
+                                ${
+                                    !notification.is_read
+                                    ?
+                                    "background:#eff6ff;"
+                                    :
+                                    ""
+                                }
+                                ">
+
+                                <div style="
+                                    display:flex;
+                                    gap:10px;
+                                    align-items:flex-start;
+                                    ">
+
+                                    <div style="
+                                        font-size:20px;
+                                        ">
+                                        ${emoji}
+                                    </div>
+
+                                    <div style="
+                                        flex:1;
+                                        min-width:0;
+                                        ">
+
+                                        <div style="
+                                            color:#475569;
+                                            font-size:12px;
+                                            line-height:1.45;
+                                            ">
+
+                                            ${texto}
+
+                                        </div>
+
+                                        <div style="
+                                            color:#94a3b8;
+                                            font-size:10px;
+                                            margin-top:4px;
+                                            ">
+
+                                            ${tiempoRelativo(
+                                                notification.created_at
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                    ${
+                                        !notification.is_read
+                                        ?
+                                        `
+                                        <div style="
+                                            width:7px;
+                                            height:7px;
+                                            background:#2563eb;
+                                            border-radius:50%;
+                                            margin-top:5px;
+                                            ">
+                                        </div>
+                                        `
+                                        :
+                                        ""
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
+
+
+    /* =====================================================
+       EVENTOS NOTIFICACIONES
+    ====================================================== */
+
+    function enlazarNotificaciones() {
+
+        const btn =
+            document.getElementById(
+                "btn-notif"
+            );
+
+        const panel =
+            document.getElementById(
+                "notif-panel"
+            );
+
+        const marcar =
+            document.getElementById(
+                "btn-marcar-leidas"
+            );
+
+
+        btn.addEventListener(
+            "click",
+            async function (event) {
+
+                event.stopPropagation();
+
+                panel.classList.toggle(
+                    "hidden"
+                );
+
+
+                if (
+                    !panel.classList.contains(
+                        "hidden"
+                    )
+                ) {
+
+                    await marcarTodasLeidas();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    !panel.contains(
+                        event.target
+                    ) &&
+                    event.target !== btn
+                ) {
+
+                    panel.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            }
+        );
+
+
+        marcar.addEventListener(
+            "click",
+            async function (event) {
+
+                event.stopPropagation();
+
+                await marcarTodasLeidas();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       MARCAR LEÍDAS
+    ====================================================== */
+
+    async function marcarTodasLeidas() {
+
+        const noLeidas =
+            notificaciones.filter(
+                notification =>
+                    !notification.is_read
+            );
+
+
+        if (
+            noLeidas.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        await sb
+            .from("notifications")
+            .update({
+                is_read: true
+            })
+            .in(
+                "id",
+                noLeidas.map(
+                    notification =>
+                        notification.id
+                )
+            );
+
+
+        notificaciones =
+            notificaciones.map(
+                notification => ({
+
+                    ...notification,
+
+                    is_read: true
+
+                })
+            );
+
+
+        await pintarNotificaciones();
+
+    }
+
+
+    /* =====================================================
+       IMÁGENES
+    ====================================================== */
+
+    const inputImagen =
+        document.getElementById(
+            "post-image"
+        );
+
+    const previewWrap =
+        document.getElementById(
+            "post-image-preview"
+        );
+
+    const previewImg =
+        document.getElementById(
+            "post-image-preview-img"
+        );
+
+
+    inputImagen.addEventListener(
+        "change",
+        function (event) {
+
+            const file =
+                event.target.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                mostrarToast(
+                    "Selecciona una imagen válida.",
+                    true
+                );
+
+                inputImagen.value =
+                    "";
+
+                return;
+
+            }
+
+
+            if (
+                file.size >
+                2 * 1024 * 1024
+            ) {
+
+                mostrarToast(
+                    "La imagen es demasiado grande. Máximo 2 MB.",
+                    true
+                );
+
+                inputImagen.value =
+                    "";
+
+                return;
+
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (eventReader) {
+
+                    imagenBase64 =
+                        eventReader.target.result;
+
+
+                    previewImg.src =
+                        imagenBase64;
+
+
+                    previewWrap
+                        .classList
+                        .remove(
+                            "hidden"
+                        );
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       QUITAR IMAGEN
+    ====================================================== */
+
+    document
+        .getElementById(
+            "btn-quitar-imagen"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                imagenBase64 =
+                    "";
+
+                inputImagen.value =
+                    "";
+
+                previewImg.src =
+                    "";
+
+                previewWrap
+                    .classList
+                    .add(
+                        "hidden"
+                    );
+
+            }
+        );
+
+
+    /* =====================================================
+       PUBLICAR
+    ====================================================== */
+
+    document
+        .getElementById(
+            "btn-publicar"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+
+                if (
+                    !sb ||
+                    !currentUser
+                ) {
+
+                    mostrarToast(
+                        "No hay una sesión activa.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const textarea =
+                    document.getElementById(
+                        "post-content"
+                    );
+
+
+                const content =
+                    textarea.value.trim();
+
+
+                if (
+                    !content &&
+                    !imagenBase64
+                ) {
+
+                    mostrarToast(
+                        "Escribe algo o añade una imagen.",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const button =
+                    document.getElementById(
+                        "btn-publicar"
+                    );
+
+
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    "Publicando...";
+
+
+                try {
+
+                    const {
+                        error
+                    } =
+                        await sb
+                            .from("posts")
+                            .insert({
+
+                                user_id:
+                                    currentUser.id,
+
+                                content:
+                                    content ||
+                                    " ",
+
+                                image_url:
+                                    imagenBase64 ||
+                                    null
+
+                            });
+
+
+                    if (error) {
+
+                        console.error(
+                            error
+                        );
+
+                        mostrarToast(
+                            "Error al publicar.",
+                            true
+                        );
+
+                        return;
+
+                    }
+
+
+                    textarea.value =
+                        "";
+
+                    imagenBase64 =
+                        "";
+
+                    inputImagen.value =
+                        "";
+
+                    previewImg.src =
+                        "";
+
+                    previewWrap
+                        .classList
+                        .add(
+                            "hidden"
+                        );
+
+
+                    mostrarToast(
+                        "¡Publicación realizada! ✓"
+                    );
+
+
+                    await cargarPosts();
+
+                }
+                finally {
+
+                    button.disabled =
+                        false;
+
+                    button.textContent =
+                        "Publicar";
+
+                }
+
+            }
+        );
+
+
+    /* =====================================================
+       CERRAR SESIÓN
+    ====================================================== */
+
+    document
+        .getElementById(
+            "btn-logout"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+
+                if (sb) {
+
+                    await sb.auth.signOut();
+
+                }
+
+
+                window.location.href =
+                    "index.html";
+
+            }
+        );
+
+
+    /* =====================================================
+       ACTUALIZAR NOTIFICACIONES
+    ====================================================== */
+
+    setInterval(
+        async function () {
+
+            if (
+                currentUser &&
+                sb
+            ) {
+
+                await cargarNotificaciones();
+
+            }
+
+        },
+        30000
+    );
+
+
+    /* =====================================================
+       MOSTRAR ERROR
+    ====================================================== */
+
+    function mostrarError(
+        mensaje
+    ) {
+
+        postsContainer.innerHTML = `
+
+            <div class="error-box">
+
+                ${escapeHtml(mensaje)}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =====================================================
+       INICIAR
+    ====================================================== */
+
+    iniciar();
+
+
+})();
+
+</script>
+
+</body>
+</html>
+```
