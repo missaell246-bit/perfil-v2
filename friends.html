@@ -497,13 +497,12 @@
 
 <script>
 
-  /* ==========================================
-     CONFIGURACIÓN NUEVO SUPABASE
-  ========================================== */
+ const SUPABASE_URL =
+        "https://urpkgcvlgdesdwkyhdqo.supabase.co ";
 
-  const SUPABASE_URL = "NUEVA_SUPABASE_URL";
+    const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVycGtnY3ZsZ2Rlc2R3a3loZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MTA0NDEsImV4cCI6MjEwNDk4NjQ0MX0.pP3lryKAT973Bo_ke6wkQ2f3TSCsggXfsfnDniAYQ4A";
 
-  const SUPABASE_ANON_KEY = "NUEVA_SUPABASE_ANON_KEY";
 
   const sb = window.supabase.createClient(
     SUPABASE_URL,
