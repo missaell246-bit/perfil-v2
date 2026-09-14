@@ -1,0 +1,1352 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mensajes | RedSocial</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    button,
+    textarea {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .topbar {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar-inner {
+      width: min(1200px, calc(100% - 28px));
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      text-decoration: none;
+      color: #2563eb;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .brand span {
+      color: #0f172a;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: #475569;
+      text-decoration: none;
+      padding: 8px 11px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .nav-btn:hover {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .logout-btn {
+      color: #dc2626;
+    }
+
+    .chat-layout {
+      height: calc(100vh - 64px);
+      max-width: 1200px;
+      margin: auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+    }
+
+    .sidebar,
+    .chat-panel {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .06);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-header h2 {
+      font-size: 19px;
+      margin-bottom: 5px;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .contacts {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .contact {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: white;
+      border: none;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: left;
+    }
+
+    .contact:hover,
+    .contact.active {
+      background: #eff6ff;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
+      color: white;
+      font-weight: 800;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .contact-info {
+      min-width: 0;
+    }
+
+    .contact-name {
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-username {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      min-height: 75px;
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-user-name {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .chat-user-status {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      background:
+        linear-gradient(
+          180deg,
+          #f8fafc 0%,
+          #f1f5f9 100%
+        );
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .message-row.mine {
+      justify-content: flex-end;
+    }
+
+    .message-row.other {
+      justify-content: flex-start;
+    }
+
+    .message-bubble {
+      max-width: min(75%, 520px);
+      padding: 11px 14px;
+      border-radius: 15px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .mine .message-bubble {
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .other .message-bubble {
+      background: white;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-time {
+      display: block;
+      margin-top: 5px;
+      font-size: 10px;
+      opacity: .7;
+    }
+
+    .message-input-area {
+      padding: 14px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 10px;
+      background: white;
+    }
+
+    .message-input-area textarea {
+      flex: 1;
+      resize: none;
+      height: 48px;
+      max-height: 120px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 13px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .message-input-area textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+    }
+
+    .send-btn {
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 12px;
+      padding: 0 20px;
+      font-weight: 800;
+    }
+
+    .send-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .empty-chat,
+    .empty-contacts {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #64748b;
+      padding: 30px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translate(-50%, 20px);
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s;
+      font-size: 14px;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .toast.error {
+      background: #dc2626;
+    }
+
+    @media (max-width: 800px) {
+
+      .chat-layout {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .sidebar {
+        max-height: 190px;
+      }
+
+      .chat-panel {
+        min-height: 0;
+      }
+
+      .nav-btn span {
+        display: none;
+      }
+
+      .topbar-inner {
+        width: calc(100% - 18px);
+      }
+
+      .message-bubble {
+        max-width: 88%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="topbar-inner">
+
+    <a href="feed.html" class="brand">
+      Red<span>Social</span>
+    </a>
+
+    <nav class="nav-actions">
+
+      <a href="feed.html" class="nav-btn">
+        🏠 <span>Inicio</span>
+      </a>
+
+      <a href="friends.html" class="nav-btn">
+        👥 <span>Amigos</span>
+      </a>
+
+      <a href="profile.html" class="nav-btn">
+        👤 <span>Perfil</span>
+      </a>
+
+      <button
+        id="btn-logout"
+        class="nav-btn logout-btn"
+      >
+        🚪 <span>Salir</span>
+      </button>
+
+    </nav>
+
+  </div>
+
+</header>
+
+
+<main class="chat-layout">
+
+  <aside class="sidebar">
+
+    <div class="sidebar-header">
+
+      <h2>💬 Mensajes</h2>
+
+      <p>
+        Conversa con tus amigos
+      </p>
+
+    </div>
+
+
+    <div
+      id="contacts-list"
+      class="contacts"
+    >
+
+      <div class="empty-contacts">
+        Cargando contactos...
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <section class="chat-panel">
+
+    <div
+      id="empty-chat"
+      class="empty-chat"
+    >
+
+      <div>
+
+        <h2>💬 Tus mensajes</h2>
+
+        <br>
+
+        <p>
+          Selecciona un amigo para comenzar una conversación.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="active-chat"
+      class="hidden"
+      style="
+        height:100%;
+        display:flex;
+        flex-direction:column;
+      "
+    >
+
+      <div class="chat-header">
+
+        <div
+          id="chat-avatar"
+          class="avatar"
+        >
+          U
+        </div>
+
+        <div>
+
+          <div
+            id="chat-user-name"
+            class="chat-user-name"
+          >
+            Usuario
+          </div>
+
+          <div class="chat-user-status">
+            Conversación privada
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="messages"
+        class="messages"
+      ></div>
+
+
+      <div class="message-input-area">
+
+        <textarea
+          id="message-input"
+          placeholder="Escribe un mensaje..."
+          maxlength="2000"
+        ></textarea>
+
+        <button
+          id="send-btn"
+          class="send-btn"
+        >
+          Enviar
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+  /* ==========================================
+     CONFIGURACIÓN NUEVO SUPABASE
+  ========================================== */
+
+  const SUPABASE_URL =
+    "NUEVA_SUPABASE_URL";
+
+  const SUPABASE_ANON_KEY =
+    "NUEVA_SUPABASE_ANON_KEY";
+
+
+  const sb =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  let currentUser = null;
+
+  let friends = [];
+
+  let selectedUser = null;
+
+  let realtimeChannel = null;
+
+
+  const toastEl =
+    document.getElementById("toast");
+
+
+  let toastTimer;
+
+
+  function mostrarToast(
+    mensaje,
+    tipo = "success"
+  ) {
+
+    toastEl.textContent = mensaje;
+
+    toastEl.className =
+      "toast show";
+
+    if (tipo === "error") {
+      toastEl.classList.add("error");
+    }
+
+
+    clearTimeout(toastTimer);
+
+
+    toastTimer =
+      setTimeout(() => {
+
+        toastEl.classList.remove("show");
+
+      }, 3000);
+
+  }
+
+
+  function escapeHTML(text) {
+
+    const div =
+      document.createElement("div");
+
+    div.textContent = text || "";
+
+    return div.innerHTML;
+
+  }
+
+
+  function avatarHTML(profile) {
+
+    if (profile.avatar_url) {
+
+      return `
+        <div class="avatar">
+          <img
+            src="${escapeHTML(profile.avatar_url)}"
+            alt="Avatar"
+          >
+        </div>
+      `;
+
+    }
+
+
+    const nombre =
+      profile.full_name ||
+      profile.username ||
+      "U";
+
+
+    return `
+      <div class="avatar">
+        ${escapeHTML(
+          nombre.charAt(0).toUpperCase()
+        )}
+      </div>
+    `;
+
+  }
+
+
+  async function iniciar() {
+
+    const {
+      data: {
+        session
+      }
+    } = await sb.auth.getSession();
+
+
+    if (!session) {
+
+      window.location.href =
+        "index.html";
+
+      return;
+
+    }
+
+
+    currentUser =
+      session.user;
+
+
+    await cargarAmigos();
+
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+
+    const userId =
+      params.get("user");
+
+
+    if (userId) {
+
+      const user =
+        friends.find(
+          friend => friend.id === userId
+        );
+
+
+      if (user) {
+
+        abrirChat(user);
+
+      }
+
+    }
+
+  }
+
+
+  async function cargarAmigos() {
+
+    try {
+
+      const {
+        data: friendships,
+        error
+      } = await sb
+        .from("friendships")
+        .select("*")
+        .eq("status", "accepted")
+        .or(
+          `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
+        );
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      const friendIds =
+        (friendships || []).map(
+          friendship =>
+
+            friendship.sender_id === currentUser.id
+              ? friendship.receiver_id
+              : friendship.sender_id
+
+        );
+
+
+      if (!friendIds.length) {
+
+        friends = [];
+
+        renderContacts();
+
+        return;
+
+      }
+
+
+      const {
+        data: profiles,
+        error: profilesError
+      } = await sb
+        .from("profiles")
+        .select("*")
+        .in("id", friendIds);
+
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+
+      friends = profiles || [];
+
+
+      renderContacts();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudieron cargar los contactos",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  function renderContacts() {
+
+    const container =
+      document.getElementById(
+        "contacts-list"
+      );
+
+
+    if (!friends.length) {
+
+      container.innerHTML = `
+        <div class="empty-contacts">
+          Aún no tienes amigos.<br><br>
+          Ve a la sección Amigos para agregar personas.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      friends.map(friend => {
+
+        const activo =
+          selectedUser &&
+          selectedUser.id === friend.id
+            ? "active"
+            : "";
+
+
+        const nombre =
+          escapeHTML(
+            friend.full_name || "Usuario"
+          );
+
+
+        const username =
+          escapeHTML(
+            friend.username || "usuario"
+          );
+
+
+        return `
+          <button
+            class="contact ${activo}"
+            onclick="seleccionarContacto('${friend.id}')"
+          >
+
+            ${avatarHTML(friend)}
+
+            <div class="contact-info">
+
+              <div class="contact-name">
+                ${nombre}
+              </div>
+
+              <div class="contact-username">
+                @${username}
+              </div>
+
+            </div>
+
+          </button>
+        `;
+
+      }).join("");
+
+  }
+
+
+  function seleccionarContacto(userId) {
+
+    const friend =
+      friends.find(
+        item => item.id === userId
+      );
+
+
+    if (friend) {
+
+      abrirChat(friend);
+
+    }
+
+  }
+
+
+  async function abrirChat(friend) {
+
+    selectedUser = friend;
+
+
+    document
+      .getElementById("empty-chat")
+      .classList.add("hidden");
+
+
+    const activeChat =
+      document.getElementById(
+        "active-chat"
+      );
+
+
+    activeChat.classList.remove("hidden");
+
+
+    const avatarContainer =
+      document.getElementById(
+        "chat-avatar"
+      );
+
+
+    if (friend.avatar_url) {
+
+      avatarContainer.innerHTML = `
+        <img
+          src="${escapeHTML(friend.avatar_url)}"
+          alt="Avatar"
+        >
+      `;
+
+    } else {
+
+      const nombre =
+        friend.full_name ||
+        friend.username ||
+        "U";
+
+
+      avatarContainer.textContent =
+        nombre.charAt(0).toUpperCase();
+
+    }
+
+
+    document
+      .getElementById(
+        "chat-user-name"
+      )
+      .textContent =
+        friend.full_name ||
+        friend.username ||
+        "Usuario";
+
+
+    const url =
+      new URL(
+        window.location.href
+      );
+
+
+    url.searchParams.set(
+      "user",
+      friend.id
+    );
+
+
+    window.history.replaceState(
+      {},
+      "",
+      url
+    );
+
+
+    renderContacts();
+
+
+    await cargarMensajes();
+
+
+    activarRealtime();
+
+  }
+
+
+  async function cargarMensajes() {
+
+    if (!selectedUser) {
+      return;
+    }
+
+
+    const container =
+      document.getElementById(
+        "messages"
+      );
+
+
+    container.innerHTML =
+      `<div class="empty-chat">
+        Cargando mensajes...
+      </div>`;
+
+
+    try {
+
+      const {
+        data,
+        error
+      } = await sb
+        .from("messages")
+        .select("*")
+        .or(
+          `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`
+        )
+        .order(
+          "created_at",
+          {
+            ascending: true
+          }
+        );
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      renderMessages(
+        data || []
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      container.innerHTML = `
+        <div class="empty-chat">
+          No se pudieron cargar los mensajes.
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  function renderMessages(messages) {
+
+    const container =
+      document.getElementById(
+        "messages"
+      );
+
+
+    if (!messages.length) {
+
+      container.innerHTML = `
+        <div class="empty-chat">
+          <div>
+            <h3>Aún no hay mensajes</h3>
+            <br>
+            <p>
+              Envía el primer mensaje.
+            </p>
+          </div>
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      messages.map(
+        message => messageHTML(message)
+      ).join("");
+
+
+    scrollToBottom();
+
+  }
+
+
+  function messageHTML(message) {
+
+    const mine =
+      message.sender_id === currentUser.id;
+
+
+    const clase =
+      mine
+        ? "mine"
+        : "other";
+
+
+    const fecha =
+      new Date(
+        message.created_at
+      );
+
+
+    const hora =
+      fecha.toLocaleTimeString(
+        "es-BO",
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
+
+
+    return `
+      <div class="message-row ${clase}">
+
+        <div class="message-bubble">
+
+          ${escapeHTML(message.content)}
+
+          <span class="message-time">
+            ${hora}
+          </span>
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+
+  function scrollToBottom() {
+
+    const container =
+      document.getElementById(
+        "messages"
+      );
+
+
+    setTimeout(() => {
+
+      container.scrollTop =
+        container.scrollHeight;
+
+    }, 50);
+
+  }
+
+
+  async function enviarMensaje() {
+
+    if (!selectedUser) {
+      return;
+    }
+
+
+    const input =
+      document.getElementById(
+        "message-input"
+      );
+
+
+    const contenido =
+      input.value.trim();
+
+
+    if (!contenido) {
+      return;
+    }
+
+
+    input.disabled = true;
+
+
+    try {
+
+      const {
+        error
+      } = await sb
+        .from("messages")
+        .insert({
+          sender_id: currentUser.id,
+          receiver_id: selectedUser.id,
+          content: contenido
+        });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      input.value = "";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      mostrarToast(
+        "No se pudo enviar el mensaje",
+        "error"
+      );
+
+    } finally {
+
+      input.disabled = false;
+
+      input.focus();
+
+    }
+
+  }
+
+
+  function activarRealtime() {
+
+    if (realtimeChannel) {
+
+      sb.removeChannel(
+        realtimeChannel
+      );
+
+    }
+
+
+    realtimeChannel =
+      sb
+        .channel(
+          "chat-" +
+          currentUser.id +
+          "-" +
+          selectedUser.id
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages"
+          },
+          payload => {
+
+            const message =
+              payload.new;
+
+
+            const esDeEstaConversacion =
+
+              (
+                message.sender_id === currentUser.id &&
+                message.receiver_id === selectedUser.id
+              )
+
+              ||
+
+              (
+                message.sender_id === selectedUser.id &&
+                message.receiver_id === currentUser.id
+              );
+
+
+            if (!esDeEstaConversacion) {
+              return;
+            }
+
+
+            const container =
+              document.getElementById(
+                "messages"
+              );
+
+
+            const empty =
+              container.querySelector(
+                ".empty-chat"
+              );
+
+
+            if (empty) {
+              container.innerHTML = "";
+            }
+
+
+            const existe =
+              container.querySelector(
+                `[data-message-id="${message.id}"]`
+              );
+
+
+            if (!existe) {
+
+              container.insertAdjacentHTML(
+                "beforeend",
+                messageHTML(message)
+              );
+
+              scrollToBottom();
+
+            }
+
+          }
+        )
+        .subscribe();
+
+  }
+
+
+  document
+    .getElementById("send-btn")
+    .addEventListener(
+      "click",
+      enviarMensaje
+    );
+
+
+  document
+    .getElementById("message-input")
+    .addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+
+          event.preventDefault();
+
+          enviarMensaje();
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById("btn-logout")
+    .addEventListener(
+      "click",
+      async () => {
+
+        await sb.auth.signOut();
+
+        window.location.href =
+          "index.html";
+
+      }
+    );
+
+
+  sb.auth.onAuthStateChange(
+    (
+      event,
+      session
+    ) => {
+
+      if (
+        event === "SIGNED_OUT" ||
+        !session
+      ) {
+
+        window.location.href =
+          "index.html";
+
+      }
+
+    }
+  );
+
+
+  iniciar();
+
+</script>
+
+</body>
+</html>
+```
