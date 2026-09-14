@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Red Social | Iniciar sesión</title>
+    <title>Red131 | Conecta con todos</title>
 
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -19,248 +20,335 @@
         :root {
             --primary: #1877f2;
             --primary-dark: #0d65d9;
+            --secondary: #42b72a;
             --background: #f0f2f5;
             --card: #ffffff;
             --text: #1c1e21;
             --muted: #65676b;
             --border: #dddfe2;
-            --success: #31a24c;
             --danger: #e41e3f;
+            --success: #31a24c;
         }
 
         body {
             min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
             background: var(--background);
+            font-family: Arial, Helvetica, sans-serif;
             color: var(--text);
+        }
+
+        /* =========================================
+           CONTENEDOR PRINCIPAL
+        ========================================= */
+
+        .page {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 25px;
+            padding: 30px 20px;
         }
 
-        .page {
+        .container {
             width: 100%;
-            max-width: 1050px;
+            max-width: 1100px;
             display: grid;
             grid-template-columns: 1fr 420px;
-            gap: 70px;
+            gap: 80px;
             align-items: center;
         }
 
-        /* =========================
+        /* =========================================
            PRESENTACIÓN
-        ========================= */
+        ========================================= */
 
         .presentation {
             padding: 20px;
         }
 
-        .logo {
-            font-size: 64px;
+        .brand {
+            color: var(--primary);
+            font-size: 62px;
             font-weight: 800;
             letter-spacing: -4px;
-            color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 18px;
         }
 
         .presentation h1 {
-            font-size: 34px;
-            line-height: 1.2;
-            margin-bottom: 15px;
+            font-size: 38px;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            max-width: 580px;
         }
 
-        .presentation p {
+        .presentation > p {
             color: var(--muted);
-            font-size: 20px;
+            font-size: 21px;
             line-height: 1.5;
-            max-width: 550px;
+            max-width: 560px;
         }
+
+        /* =========================================
+           CARACTERÍSTICAS
+        ========================================= */
 
         .features {
-            margin-top: 30px;
+            margin-top: 35px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
 
         .feature {
             display: flex;
             align-items: center;
-            gap: 13px;
+            gap: 15px;
+            font-size: 16px;
             color: #444;
         }
 
         .feature-icon {
-            width: 40px;
-            height: 40px;
+            width: 43px;
+            height: 43px;
             border-radius: 50%;
             background: white;
             display: flex;
-            justify-content: center;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,.08);
-            font-size: 19px;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
         }
 
-        /* =========================
-           TARJETA
-        ========================= */
+        /* =========================================
+           TARJETA DE AUTENTICACIÓN
+        ========================================= */
 
-        .card {
+        .auth-wrapper {
+            width: 100%;
+        }
+
+        .auth-card {
             background: var(--card);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 25px;
-            box-shadow: 0 3px 15px rgba(0,0,0,.15);
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.12),
+                0 12px 35px rgba(0,0,0,.06);
         }
+
+        /* =========================================
+           PESTAÑAS
+        ========================================= */
 
         .tabs {
             display: flex;
+            gap: 4px;
             background: #f0f2f5;
-            border-radius: 9px;
+            border-radius: 10px;
             padding: 4px;
-            margin-bottom: 22px;
+            margin-bottom: 25px;
         }
 
         .tab {
             flex: 1;
             border: none;
             background: transparent;
-            padding: 11px;
-            border-radius: 7px;
-            font-weight: 600;
-            cursor: pointer;
             color: var(--muted);
+            padding: 12px 8px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
             transition: .2s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
         }
 
         .tab.active {
             background: white;
             color: var(--primary);
-            box-shadow: 0 1px 4px rgba(0,0,0,.12);
+            box-shadow: 0 1px 5px rgba(0,0,0,.10);
         }
 
-        .form {
+        /* =========================================
+           FORMULARIOS
+        ========================================= */
+
+        .auth-form {
             display: none;
         }
 
-        .form.active {
+        .auth-form.active {
             display: block;
         }
 
         .form-title {
-            font-size: 22px;
-            margin-bottom: 5px;
+            font-size: 24px;
+            margin-bottom: 6px;
         }
 
         .form-description {
             color: var(--muted);
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .field {
-            margin-bottom: 13px;
+            margin-bottom: 15px;
         }
 
         .field label {
             display: block;
             font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-weight: 700;
+            margin-bottom: 7px;
         }
 
         .field input {
             width: 100%;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 13px;
+            border-radius: 9px;
+            padding: 13px 14px;
+            background: #fff;
+            color: var(--text);
             font-size: 15px;
             outline: none;
             transition: .2s;
         }
 
-        .field input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(24,119,242,.15);
+        .field input::placeholder {
+            color: #9aa0a6;
         }
 
-        .button {
+        .field input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(24,119,242,.12);
+        }
+
+        /* =========================================
+           BOTÓN PRINCIPAL
+        ========================================= */
+
+        .main-button {
             width: 100%;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             padding: 13px;
-            color: white;
             background: var(--primary);
+            color: white;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 5px;
             transition: .2s;
         }
 
-        .button:hover {
+        .main-button:hover {
             background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
-        .button:disabled {
+        .main-button:active {
+            transform: translateY(0);
+        }
+
+        .main-button:disabled {
             opacity: .6;
             cursor: not-allowed;
+            transform: none;
         }
+
+        /* =========================================
+           DIVISOR
+        ========================================= */
 
         .divider {
+            width: 100%;
             height: 1px;
             background: var(--border);
-            margin: 23px 0;
+            margin: 24px 0;
         }
 
-        .message {
-            min-height: 22px;
-            margin-top: 15px;
+        /* =========================================
+           MENSAJES
+        ========================================= */
+
+        #message {
+            min-height: 20px;
             text-align: center;
+            margin-top: 15px;
             font-size: 14px;
             line-height: 1.4;
         }
 
-        .message.success {
+        #message.success {
             color: var(--success);
         }
 
-        .message.error {
+        #message.error {
             color: var(--danger);
         }
 
-        .terms {
-            text-align: center;
+        #message.info {
             color: var(--muted);
+        }
+
+        /* =========================================
+           INFORMACIÓN
+        ========================================= */
+
+        .terms {
+            color: var(--muted);
+            text-align: center;
             font-size: 11px;
-            margin-top: 20px;
             line-height: 1.5;
         }
 
-        .footer {
+        .copyright {
             text-align: center;
             color: var(--muted);
             font-size: 12px;
             margin-top: 18px;
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        /* =========================================
+           INDICADOR DE CARGA
+        ========================================= */
 
-        @media (max-width: 800px) {
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
 
-            body {
-                padding: 15px;
-                align-items: flex-start;
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
+        }
 
-            .page {
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 850px) {
+
+            .container {
                 grid-template-columns: 1fr;
-                gap: 20px;
-                max-width: 500px;
-                margin-top: 20px;
+                max-width: 480px;
+                gap: 25px;
             }
 
             .presentation {
@@ -268,24 +356,42 @@
                 padding: 5px;
             }
 
-            .logo {
-                font-size: 48px;
+            .brand {
+                font-size: 50px;
+                letter-spacing: -3px;
+                margin-bottom: 10px;
             }
 
             .presentation h1 {
-                font-size: 26px;
+                font-size: 28px;
             }
 
-            .presentation p {
+            .presentation > p {
                 font-size: 16px;
             }
 
             .features {
                 display: none;
             }
+        }
 
-            .card {
+        @media (max-width: 480px) {
+
+            .page {
+                padding: 15px;
+            }
+
+            .auth-card {
                 padding: 20px;
+                border-radius: 14px;
+            }
+
+            .brand {
+                font-size: 43px;
+            }
+
+            .presentation h1 {
+                font-size: 24px;
             }
         }
     </style>
@@ -295,624 +401,897 @@
 
 <div class="page">
 
-    <!-- =========================
-         PRESENTACIÓN
-    ========================== -->
+    <div class="container">
 
-    <section class="presentation">
+        <!-- =====================================
+             PRESENTACIÓN
+        ====================================== -->
 
-        <div class="logo">
-            Red131
-        </div>
+        <section class="presentation">
 
-        <h1>
-            Conecta con tus amigos y comparte tu mundo.
-        </h1>
-
-        <p>
-            Una nueva experiencia social para compartir publicaciones,
-            conversar, conocer personas y mantenerte conectado.
-        </p>
-
-        <div class="features">
-
-            <div class="feature">
-                <div class="feature-icon">👥</div>
-                <span>Encuentra y agrega amigos.</span>
+            <div class="brand">
+                Red131
             </div>
 
-            <div class="feature">
-                <div class="feature-icon">📸</div>
-                <span>Comparte publicaciones y fotografías.</span>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">💬</div>
-                <span>Habla con tus amigos mediante mensajes.</span>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         LOGIN / REGISTRO
-    ========================== -->
-
-    <section>
-
-        <div class="card">
-
-            <div class="tabs">
-
-                <button
-                    id="tab-login"
-                    class="tab active"
-                    type="button">
-                    Iniciar sesión
-                </button>
-
-                <button
-                    id="tab-register"
-                    class="tab"
-                    type="button">
-                    Crear cuenta
-                </button>
-
-            </div>
-
-
-            <!-- =========================
-                 LOGIN
-            ========================== -->
-
-            <form id="form-login" class="form active">
-
-                <h2 class="form-title">
-                    Bienvenido nuevamente
-                </h2>
-
-                <p class="form-description">
-                    Ingresa a tu cuenta para continuar.
-                </p>
-
-                <div class="field">
-
-                    <label for="login-email">
-                        Correo electrónico
-                    </label>
-
-                    <input
-                        id="login-email"
-                        type="email"
-                        placeholder="correo@ejemplo.com"
-                        autocomplete="email"
-                        required>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="login-password">
-                        Contraseña
-                    </label>
-
-                    <input
-                        id="login-password"
-                        type="password"
-                        placeholder="Tu contraseña"
-                        autocomplete="current-password"
-                        required>
-
-                </div>
-
-
-                <button
-                    id="btn-login"
-                    class="button"
-                    type="submit">
-
-                    Iniciar sesión
-
-                </button>
-
-            </form>
-
-
-            <!-- =========================
-                 REGISTRO
-            ========================== -->
-
-            <form id="form-register" class="form">
-
-                <h2 class="form-title">
-                    Crear una cuenta
-                </h2>
-
-                <p class="form-description">
-                    Regístrate y empieza a conectar con otras personas.
-                </p>
-
-
-                <div class="field">
-
-                    <label for="reg-fullname">
-                        Nombre completo
-                    </label>
-
-                    <input
-                        id="reg-fullname"
-                        type="text"
-                        placeholder="Tu nombre completo"
-                        autocomplete="name"
-                        required>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="reg-username">
-                        Nombre de usuario
-                    </label>
-
-                    <input
-                        id="reg-username"
-                        type="text"
-                        placeholder="usuario123"
-                        autocomplete="username"
-                        required>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="reg-email">
-                        Correo electrónico
-                    </label>
-
-                    <input
-                        id="reg-email"
-                        type="email"
-                        placeholder="correo@ejemplo.com"
-                        autocomplete="email"
-                        required>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="reg-password">
-                        Contraseña
-                    </label>
-
-                    <input
-                        id="reg-password"
-                        type="password"
-                        placeholder="Mínimo 6 caracteres"
-                        autocomplete="new-password"
-                        minlength="6"
-                        required>
-
-                </div>
-
-
-                <button
-                    id="btn-register"
-                    class="button"
-                    type="submit">
-
-                    Crear cuenta
-
-                </button>
-
-            </form>
-
-
-            <div id="mensaje" class="message"></div>
-
-
-            <div class="divider"></div>
-
-            <p class="terms">
-                Al crear una cuenta aceptas utilizar la plataforma
-                de manera responsable.
+            <h1>
+                Conecta, comparte y conversa.
+            </h1>
+
+            <p>
+                Tu espacio para mantenerte conectado con tus amigos,
+                compartir momentos y descubrir nuevas personas.
             </p>
 
-        </div>
+            <div class="features">
 
-        <div class="footer">
-            © 2026 Red131
-        </div>
+                <div class="feature">
 
-    </section>
+                    <div class="feature-icon">
+                        👥
+                    </div>
+
+                    <span>
+                        Encuentra y agrega nuevos amigos.
+                    </span>
+
+                </div>
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        📷
+                    </div>
+
+                    <span>
+                        Comparte fotografías y publicaciones.
+                    </span>
+
+                </div>
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        💬
+                    </div>
+
+                    <span>
+                        Conversa mediante mensajes privados.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             AUTENTICACIÓN
+        ====================================== -->
+
+        <section class="auth-wrapper">
+
+            <div class="auth-card">
+
+                <!-- PESTAÑAS -->
+
+                <div class="tabs">
+
+                    <button
+                        id="loginTab"
+                        class="tab active"
+                        type="button">
+
+                        Iniciar sesión
+
+                    </button>
+
+                    <button
+                        id="registerTab"
+                        class="tab"
+                        type="button">
+
+                        Crear cuenta
+
+                    </button>
+
+                </div>
+
+
+                <!-- =================================
+                     LOGIN
+                ================================== -->
+
+                <form
+                    id="loginForm"
+                    class="auth-form active">
+
+                    <h2 class="form-title">
+                        Bienvenido
+                    </h2>
+
+                    <p class="form-description">
+                        Ingresa a tu cuenta para continuar.
+                    </p>
+
+
+                    <div class="field">
+
+                        <label for="loginEmail">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            id="loginEmail"
+                            type="email"
+                            placeholder="correo@ejemplo.com"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="loginPassword">
+                            Contraseña
+                        </label>
+
+                        <input
+                            id="loginPassword"
+                            type="password"
+                            placeholder="Introduce tu contraseña"
+                            autocomplete="current-password"
+                            required>
+
+                    </div>
+
+
+                    <button
+                        id="loginButton"
+                        class="main-button"
+                        type="submit">
+
+                        Iniciar sesión
+
+                    </button>
+
+                </form>
+
+
+                <!-- =================================
+                     REGISTRO
+                ================================== -->
+
+                <form
+                    id="registerForm"
+                    class="auth-form">
+
+                    <h2 class="form-title">
+                        Crear cuenta
+                    </h2>
+
+                    <p class="form-description">
+                        Regístrate para comenzar a utilizar Red131.
+                    </p>
+
+
+                    <div class="field">
+
+                        <label for="registerName">
+                            Nombre completo
+                        </label>
+
+                        <input
+                            id="registerName"
+                            type="text"
+                            placeholder="Ej. Juan Pérez"
+                            autocomplete="name"
+                            maxlength="100"
+                            required>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="registerUsername">
+                            Nombre de usuario
+                        </label>
+
+                        <input
+                            id="registerUsername"
+                            type="text"
+                            placeholder="Ej. juanperez"
+                            autocomplete="username"
+                            maxlength="30"
+                            required>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="registerEmail">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            id="registerEmail"
+                            type="email"
+                            placeholder="correo@ejemplo.com"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="registerPassword">
+                            Contraseña
+                        </label>
+
+                        <input
+                            id="registerPassword"
+                            type="password"
+                            placeholder="Mínimo 6 caracteres"
+                            autocomplete="new-password"
+                            minlength="6"
+                            required>
+
+                    </div>
+
+
+                    <button
+                        id="registerButton"
+                        class="main-button"
+                        type="submit">
+
+                        Crear cuenta
+
+                    </button>
+
+                </form>
+
+
+                <!-- MENSAJE -->
+
+                <div id="message"></div>
+
+
+                <div class="divider"></div>
+
+
+                <p class="terms">
+                    Al utilizar Red131 aceptas utilizar la plataforma
+                    de forma responsable y respetuosa.
+                </p>
+
+            </div>
+
+
+            <div class="copyright">
+                © 2026 Red131 · Todos los derechos reservados
+            </div>
+
+        </section>
+
+    </div>
 
 </div>
 
 
 <script>
 
-    /* ==========================================================
-       NUEVA SUPABASE
-       ==========================================================
+    /* ============================================================
+       CONFIGURACIÓN DE SUPABASE
+       ============================================================
 
        IMPORTANTE:
-       Todavía NO pongas aquí las claves de la antigua Supabase.
 
-       Cuando creemos la nueva base de datos reemplazaremos:
+       Esta es una configuración TEMPORAL.
+
+       NO coloques aquí las credenciales de la Supabase antigua.
+
+       Cuando creemos la nueva base de datos cambiaremos:
 
        NUEVA_SUPABASE_URL
        NUEVA_SUPABASE_ANON_KEY
 
-       ========================================================== */
+       ============================================================ */
 
-    const SUPABASE_URL = "NUEVA_SUPABASE_URL";
+    const SUPABASE_URL =
+        "NUEVA_SUPABASE_URL";
 
-    const SUPABASE_ANON_KEY = "NUEVA_SUPABASE_ANON_KEY";
-
-
-    const sb = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
+    const SUPABASE_ANON_KEY =
+        "NUEVA_SUPABASE_ANON_KEY";
 
 
-    /* ==========================================================
-       ELEMENTOS
-       ========================================================== */
+    /* ============================================================
+       CLIENTE SUPABASE
+       ============================================================ */
 
-    const tabLogin =
-        document.getElementById("tab-login");
+    let supabaseClient = null;
 
-    const tabRegister =
-        document.getElementById("tab-register");
+    if (
+        SUPABASE_URL !== "NUEVA_SUPABASE_URL" &&
+        SUPABASE_ANON_KEY !== "NUEVA_SUPABASE_ANON_KEY"
+    ) {
 
-    const formLogin =
-        document.getElementById("form-login");
+        supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY
+            );
 
-    const formRegister =
-        document.getElementById("form-register");
-
-    const mensaje =
-        document.getElementById("mensaje");
-
-    const btnLogin =
-        document.getElementById("btn-login");
-
-    const btnRegister =
-        document.getElementById("btn-register");
-
-
-    /* ==========================================================
-       MENSAJES
-       ========================================================== */
-
-    function mostrarMensaje(texto, tipo = "") {
-
-        mensaje.textContent = texto;
-
-        mensaje.className =
-            "message " + tipo;
     }
 
 
-    /* ==========================================================
+    /* ============================================================
+       ELEMENTOS
+       ============================================================ */
+
+    const loginTab =
+        document.getElementById("loginTab");
+
+    const registerTab =
+        document.getElementById("registerTab");
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const registerForm =
+        document.getElementById("registerForm");
+
+    const message =
+        document.getElementById("message");
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+    const registerButton =
+        document.getElementById("registerButton");
+
+
+    /* ============================================================
+       MENSAJES
+       ============================================================ */
+
+    function showMessage(
+        text,
+        type = "info"
+    ) {
+
+        message.textContent = text;
+
+        message.className = type;
+
+    }
+
+
+    function clearMessage() {
+
+        message.textContent = "";
+
+        message.className = "";
+
+    }
+
+
+    /* ============================================================
        CAMBIAR A LOGIN
-       ========================================================== */
+       ============================================================ */
 
-    tabLogin.addEventListener("click", () => {
+    loginTab.addEventListener(
+        "click",
+        function () {
 
-        tabLogin.classList.add("active");
-        tabRegister.classList.remove("active");
+            loginTab.classList.add("active");
 
-        formLogin.classList.add("active");
-        formRegister.classList.remove("active");
+            registerTab.classList.remove("active");
 
-        mostrarMensaje("");
+            loginForm.classList.add("active");
 
-    });
+            registerForm.classList.remove("active");
+
+            clearMessage();
+
+        }
+    );
 
 
-    /* ==========================================================
+    /* ============================================================
        CAMBIAR A REGISTRO
-       ========================================================== */
+       ============================================================ */
 
-    tabRegister.addEventListener("click", () => {
+    registerTab.addEventListener(
+        "click",
+        function () {
 
-        tabRegister.classList.add("active");
-        tabLogin.classList.remove("active");
+            registerTab.classList.add("active");
 
-        formRegister.classList.add("active");
-        formLogin.classList.remove("active");
+            loginTab.classList.remove("active");
 
-        mostrarMensaje("");
+            registerForm.classList.add("active");
 
-    });
+            loginForm.classList.remove("active");
 
+            clearMessage();
 
-    /* ==========================================================
-       REGISTRO
-       ========================================================== */
-
-    formRegister.addEventListener("submit", async (event) => {
-
-        event.preventDefault();
-
-        const fullname =
-            document.getElementById("reg-fullname")
-                .value
-                .trim();
-
-        const username =
-            document.getElementById("reg-username")
-                .value
-                .trim()
-                .toLowerCase();
-
-        const email =
-            document.getElementById("reg-email")
-                .value
-                .trim()
-                .toLowerCase();
-
-        const password =
-            document.getElementById("reg-password")
-                .value;
+        }
+    );
 
 
-        if (!fullname || !username || !email || !password) {
+    /* ============================================================
+       COMPROBAR CONFIGURACIÓN
+       ============================================================ */
 
-            mostrarMensaje(
-                "Completa todos los campos.",
-                "error"
+    function checkSupabaseConfiguration() {
+
+        if (!supabaseClient) {
+
+            console.warn(
+                "Supabase todavía no está configurada."
             );
 
-            return;
+            return false;
+
         }
 
+        return true;
 
-        if (password.length < 6) {
-
-            mostrarMensaje(
-                "La contraseña debe tener al menos 6 caracteres.",
-                "error"
-            );
-
-            return;
-        }
+    }
 
 
-        btnRegister.disabled = true;
+    /* ============================================================
+       LOGIN
+       ============================================================ */
 
-        btnRegister.textContent =
-            "Creando cuenta...";
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
 
-        mostrarMensaje(
-            "Creando tu cuenta..."
-        );
+            event.preventDefault();
 
-
-        try {
-
-            const { data, error } =
-                await sb.auth.signUp({
-
-                    email: email,
-
-                    password: password,
-
-                    options: {
-
-                        data: {
-
-                            username: username,
-
-                            full_name: fullname
-
-                        }
-
-                    }
-
-                });
+            clearMessage();
 
 
-            if (error) {
+            if (!checkSupabaseConfiguration()) {
 
-                mostrarMensaje(
-                    error.message,
+                showMessage(
+                    "La nueva base de datos todavía no está configurada.",
                     "error"
                 );
 
                 return;
+
             }
 
 
-            /*
-             * Si Supabase tiene activada la confirmación
-             * por correo, data.session será null.
-             *
-             * Cuando configuremos la nueva Supabase
-             * podremos dejar el registro sin confirmación
-             * de correo si eso es lo que deseas.
-             */
+            const email =
+                document
+                    .getElementById("loginEmail")
+                    .value
+                    .trim()
+                    .toLowerCase();
 
-            if (data.session) {
 
-                mostrarMensaje(
-                    "Cuenta creada correctamente. Entrando...",
+            const password =
+                document
+                    .getElementById("loginPassword")
+                    .value;
+
+
+            if (!email || !password) {
+
+                showMessage(
+                    "Completa todos los campos.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            loginButton.disabled = true;
+
+            loginButton.innerHTML =
+                '<span class="loading">' +
+                '<span class="spinner"></span>' +
+                'Iniciando sesión...' +
+                '</span>';
+
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient.auth
+                        .signInWithPassword({
+
+                            email: email,
+
+                            password: password
+
+                        });
+
+
+                if (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        "Correo o contraseña incorrectos.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                if (!data || !data.session) {
+
+                    showMessage(
+                        "No se pudo iniciar la sesión.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                showMessage(
+                    "Inicio de sesión correcto. Entrando...",
                     "success"
                 );
 
 
-                setTimeout(() => {
+                setTimeout(
+                    function () {
 
-                    window.location.href =
-                        "feed.html";
+                        window.location.href =
+                            "feed.html";
 
-                }, 800);
-
-            } else {
-
-                mostrarMensaje(
-                    "Cuenta creada. La configuración actual de Supabase requiere confirmación de correo.",
-                    "success"
+                    },
+                    700
                 );
 
-            }
 
-        } catch (error) {
-
-            console.error(error);
-
-            mostrarMensaje(
-                "Ocurrió un error al crear la cuenta.",
-                "error"
-            );
-
-        } finally {
-
-            btnRegister.disabled = false;
-
-            btnRegister.textContent =
-                "Crear cuenta";
-
-        }
-
-    });
-
-
-    /* ==========================================================
-       LOGIN
-       ========================================================== */
-
-    formLogin.addEventListener("submit", async (event) => {
-
-        event.preventDefault();
-
-
-        const email =
-            document.getElementById("login-email")
-                .value
-                .trim()
-                .toLowerCase();
-
-        const password =
-            document.getElementById("login-password")
-                .value;
-
-
-        if (!email || !password) {
-
-            mostrarMensaje(
-                "Introduce tu correo y contraseña.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        btnLogin.disabled = true;
-
-        btnLogin.textContent =
-            "Iniciando sesión...";
-
-
-        mostrarMensaje(
-            "Comprobando tus datos..."
-        );
-
-
-        try {
-
-            const { data, error } =
-                await sb.auth.signInWithPassword({
-
-                    email: email,
-
-                    password: password
-
-                });
-
-
-            if (error) {
+            } catch (error) {
 
                 console.error(error);
 
-                mostrarMensaje(
-                    "Correo o contraseña incorrectos.",
+                showMessage(
+                    "Ocurrió un error al iniciar sesión.",
+                    "error"
+                );
+
+            } finally {
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Iniciar sesión";
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       REGISTRO
+       ============================================================ */
+
+    registerForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            clearMessage();
+
+
+            if (!checkSupabaseConfiguration()) {
+
+                showMessage(
+                    "La nueva base de datos todavía no está configurada.",
                     "error"
                 );
 
                 return;
+
             }
 
 
-            if (!data.session) {
+            const fullName =
+                document
+                    .getElementById("registerName")
+                    .value
+                    .trim();
 
-                mostrarMensaje(
-                    "No se pudo crear la sesión.",
+
+            const username =
+                document
+                    .getElementById("registerUsername")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            const email =
+                document
+                    .getElementById("registerEmail")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            const password =
+                document
+                    .getElementById("registerPassword")
+                    .value;
+
+
+            /* ---------------------------------------------
+               VALIDACIONES
+            --------------------------------------------- */
+
+            if (
+                !fullName ||
+                !username ||
+                !email ||
+                !password
+            ) {
+
+                showMessage(
+                    "Completa todos los campos.",
                     "error"
                 );
 
                 return;
+
             }
 
 
-            mostrarMensaje(
-                "Bienvenido. Entrando...",
-                "success"
-            );
+            if (username.length < 3) {
+
+                showMessage(
+                    "El nombre de usuario debe tener al menos 3 caracteres.",
+                    "error"
+                );
+
+                return;
+
+            }
 
 
-            setTimeout(() => {
+            if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
 
-                window.location.href =
-                    "feed.html";
+                showMessage(
+                    "El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.",
+                    "error"
+                );
 
-            }, 600);
+                return;
+
+            }
 
 
-        } catch (error) {
+            if (password.length < 6) {
 
-            console.error(error);
+                showMessage(
+                    "La contraseña debe tener al menos 6 caracteres.",
+                    "error"
+                );
 
-            mostrarMensaje(
-                "No se pudo iniciar sesión.",
-                "error"
-            );
+                return;
 
-        } finally {
+            }
 
-            btnLogin.disabled = false;
 
-            btnLogin.textContent =
-                "Iniciar sesión";
+            registerButton.disabled = true;
+
+            registerButton.innerHTML =
+                '<span class="loading">' +
+                '<span class="spinner"></span>' +
+                'Creando cuenta...' +
+                '</span>';
+
+
+            try {
+
+                /* -----------------------------------------
+                   CREAR USUARIO EN SUPABASE AUTH
+                ----------------------------------------- */
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient.auth
+                        .signUp({
+
+                            email: email,
+
+                            password: password,
+
+                            options: {
+
+                                data: {
+
+                                    full_name:
+                                        fullName,
+
+                                    username:
+                                        username
+
+                                }
+
+                            }
+
+                        });
+
+
+                if (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        obtenerMensajeErrorRegistro(error),
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   SESIÓN INMEDIATA
+                ----------------------------------------- */
+
+                if (data.session) {
+
+                    showMessage(
+                        "Cuenta creada correctamente. Entrando...",
+                        "success"
+                    );
+
+
+                    /*
+                     * La creación del perfil en la tabla
+                     * profiles la haremos mediante el
+                     * sistema de base de datos nuevo.
+                     */
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.href =
+                                "feed.html";
+
+                        },
+                        800
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   CONFIRMACIÓN DE CORREO
+                ----------------------------------------- */
+
+                showMessage(
+                    "La cuenta fue creada. La nueva configuración de Supabase requiere confirmación de correo.",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "Ocurrió un error al crear la cuenta.",
+                    "error"
+                );
+
+            } finally {
+
+                registerButton.disabled = false;
+
+                registerButton.textContent =
+                    "Crear cuenta";
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       MENSAJES DE ERROR DE REGISTRO
+       ============================================================ */
+
+    function obtenerMensajeErrorRegistro(error) {
+
+        if (!error) {
+
+            return "No se pudo crear la cuenta.";
 
         }
 
-    });
 
+        const texto =
+            String(
+                error.message || ""
+            ).toLowerCase();
 
-    /* ==========================================================
-       COMPROBAR SESIÓN
-       ========================================================== */
-
-    async function comprobarSesion() {
-
-        /*
-         * Mientras la nueva Supabase todavía no está configurada,
-         * no intentamos consultar una URL ficticia.
-         */
 
         if (
-            SUPABASE_URL === "NUEVA_SUPABASE_URL" ||
-            SUPABASE_ANON_KEY === "NUEVA_SUPABASE_ANON_KEY"
+            texto.includes("already registered") ||
+            texto.includes("already exists")
         ) {
+
+            return "Este correo ya está registrado.";
+
+        }
+
+
+        if (
+            texto.includes("password") &&
+            texto.includes("weak")
+        ) {
+
+            return "La contraseña es demasiado débil.";
+
+        }
+
+
+        if (
+            texto.includes("invalid email")
+        ) {
+
+            return "El correo electrónico no es válido.";
+
+        }
+
+
+        if (
+            texto.includes("rate limit")
+        ) {
+
+            return "Demasiados intentos. Espera unos minutos e inténtalo nuevamente.";
+
+        }
+
+
+        return (
+            error.message ||
+            "No se pudo crear la cuenta."
+        );
+
+    }
+
+
+    /* ============================================================
+       COMPROBAR SESIÓN EXISTENTE
+       ============================================================ */
+
+    async function checkExistingSession() {
+
+        if (!supabaseClient) {
 
             return;
 
@@ -922,13 +1301,32 @@
         try {
 
             const {
-                data: {
-                    session
-                }
-            } = await sb.auth.getSession();
+                data,
+                error
+            } =
+                await supabaseClient.auth
+                    .getSession();
 
 
-            if (session) {
+            if (error) {
+
+                console.error(error);
+
+                return;
+
+            }
+
+
+            if (
+                data &&
+                data.session
+            ) {
+
+                /*
+                 * Si ya existe una sesión,
+                 * llevamos al usuario directamente
+                 * al feed.
+                 */
 
                 window.location.href =
                     "feed.html";
@@ -947,7 +1345,11 @@
     }
 
 
-    comprobarSesion();
+    /* ============================================================
+       EJECUTAR AL CARGAR
+       ============================================================ */
+
+    checkExistingSession();
 
 </script>
 
